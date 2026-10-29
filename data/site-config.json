@@ -1,0 +1,65 @@
+{
+  "site": {
+    "title": "Bel Gray | Electronic Producer & Pianist",
+    "artistName": "Bel Gray",
+    "realName": "Daniel Belyaev",
+    "activeEraColor": "#FF5722",
+    "activeEraName": "Anxious Story Era"
+  },
+  "hero": {
+    "badge": "PIANIST & ELECTRONIC PRODUCER",
+    "title": "BEL GRAY",
+    "subtitle": "Solo piano touch meeting the energy of melodic progressive house. Crafted by Daniel Belyaev.",
+    "ctaPrimaryText": "Listen to 'Anxious Story'",
+    "ctaPrimaryLink": "#latest",
+    "ctaSecondaryText": "Meet Daniel",
+    "ctaSecondaryLink": "#about"
+  },
+  "announcement": {
+    "enabled": true,
+    "badge": "OUT NOW",
+    "text": "EP 'Anxious Story' is out now worldwide on all streaming platforms",
+    "buttonText": "Listen Now",
+    "link": "https://band.link/anxious_story"
+  },
+  "bio": {
+    "photoUrl": "assets/BGM Daniel Belyaev Photo.png",
+    "captionName": "DANIEL BELYAEV",
+    "captionRole": "Electronic Producer & Pianist",
+    "lead": "Grounded in classical piano keys, engineered for the energy of electronic music.",
+    "paragraph1": "Bel Gray is the artist alias of composer, electronic music producer, and pianist Daniel Belyaev. Built upon classical piano discipline and deep DAW engineering in FL Studio, every release is designed as an authentic emotional timeline.",
+    "paragraph2": "Most works across the catalog are purely handcrafted piano compositions and electronic synth productions. On select concept releases (like Anxious Story), neural voice synthesis and modern technology are orchestrated as creative instruments — where melodic architecture, harmony, and emotional weight always remain human-led.",
+    "quote": "And life is so beautiful, that’s all that counts. Just to heal this world and to be the light.",
+    "quoteAuthor": "Bel Gray",
+    "stats": [
+      {
+        "kicker": "CORE INSTRUMENT",
+        "value": "Acoustic Piano"
+      },
+      {
+        "kicker": "ENGINEERING",
+        "value": "FL Studio DAW"
+      },
+      {
+        "kicker": "SOUND IDENTITY",
+        "value": "Melodic Prog House"
+      }
+    ]
+  },
+  "documentary": {
+    "enabled": true,
+    "badge": "CREATIVE ARCHIVE",
+    "title": "Behind The Storm",
+    "description": "The creative documentary tracing how a raw, stumbling phone recording evolved into the four-act conceptual EP 'Anxious Story'. Studio breakdown, piano progression, and visual framing.",
+    "buttonText": "Watch Documentary on Telegram",
+    "link": "https://t.me/belgray_music"
+  },
+  "socials": {
+    "telegram": "https://t.me/belgray_music",
+    "youtube": "https://youtube.com/@belgray_music",
+    "vk": "https://vk.com/belgray_music",
+    "tiktok": "https://tiktok.com/@belgray_music",
+    "smartlink": "https://band.link/anxious_story",
+    "email": "contact@belgray.com"
+  }
+}

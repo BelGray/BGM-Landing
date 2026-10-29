@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bel Gray | Studio Control Center</title>
+  <link rel="icon" type="image/svg+xml" href="assets/BGM Logo White.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+
+  <!-- PIN Protection Gate -->
+  <div id="admin-auth-gate" class="admin-auth-overlay">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <svg viewBox="0 0 3000 3000" width="36" height="36" fill="currentColor">
+          <path d="M997.465 556.856C1021.43 389.935 1164.43 266 1333.07 266V2733.07H685L997.465 556.856Z"/>
+          <rect x="1416.72" y="266" width="230.219" height="1190.08"/>
+          <path d="M1646.05 1456.08C1822.81 1456.08 1992.33 1393.39 2117.32 1281.8C2242.31 1170.21 2312.53 1018.86 2312.53 861.042C2312.53 703.227 2242.31 551.876 2117.32 440.284C1992.33 328.692 1822.81 266 1646.05 266L1646.05 861.042V1456.08Z"/>
+          <rect x="1418.19" y="1542.98" width="230.219" height="1190.08"/>
+          <path d="M1647.52 2733.07C1824.28 2733.07 1993.81 2670.37 2118.79 2558.78C2243.78 2447.19 2314 2295.84 2314 2138.02C2314 1980.21 2243.78 1828.86 2118.79 1717.27C1993.81 1605.67 1824.28 1542.98 1647.52 1542.98L1647.52 2138.02V2733.07Z"/>
+        </svg>
+      </div>
+      <h2 class="auth-title">BEL GRAY // STUDIO CONTROL</h2>
+      <p class="auth-subtitle">Enter Studio Access PIN</p>
+
+      <form id="auth-form" class="auth-form">
+        <input type="password" id="admin-pin-input" class="auth-input" placeholder="••••" maxlength="8" autofocus autocomplete="current-password">
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          <span>Unlock Dashboard</span>
+        </button>
+      </form>
+      <span class="auth-hint">Default PIN: 1999 (customizable inside)</span>
+    </div>
+  </div>
+
+  <!-- Main Admin Dashboard -->
+  <div id="admin-dashboard" class="admin-dashboard-layout" style="display: none;">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <span class="brand-name">BEL GRAY</span>
+          <span class="brand-subtitle">Studio OS v1.0</span>
+        </div>
+        <a href="index.html" class="btn btn-sm btn-ghost" title="View live website">
+          <span>Live Site ↗</span>
+        </a>
+      </div>
+
+      <nav class="admin-nav">
+        <button class="admin-nav-item active" data-tab="tab-announcement">
+          <svg class="admin-nav-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span>Hot Banner</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-hero">
+          <svg class="admin-nav-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>Hero Section</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-releases">
+          <svg class="admin-nav-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <span>Releases Catalog</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-bio">
+          <svg class="admin-nav-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+          </svg>
+          <span>Bio & Portrait</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-media">
+          <svg class="admin-nav-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+            <line x1="7" y1="2" x2="7" y2="22"></line>
+            <line x1="17" y1="2" x2="17" y2="22"></line>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <line x1="2" y1="7" x2="7" y2="7"></line>
+            <line x1="2" y1="17" x2="7" y2="17"></line>
+            <line x1="17" y1="17" x2="22" y2="17"></line>
+            <line x1="17" y1="7" x2="22" y2="7"></line>
+          </svg>
+          <span>Documentary & Film</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-theme">
+          <svg class="admin-nav-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="13.5" cy="6.5" r=".5"></circle>
+            <circle cx="17.5" cy="10.5" r=".5"></circle>
+            <circle cx="8.5" cy="7.5" r=".5"></circle>
+            <circle cx="6.5" cy="12.5" r=".5"></circle>
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.5-.7 1.5-1.5 0-.4-.15-.75-.38-1.02-.23-.27-.38-.62-.38-1 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-4.97-4.48-9-10-9z"></path>
+          </svg>
+          <span>Theme & Colors</span>
+        </button>
+        <button class="admin-nav-item" data-tab="tab-sync">
+          <svg class="admin-nav-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+          </svg>
+          <span>Cloud & Supabase</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="btn-save-all" class="btn btn-primary" style="width: 100%;">
+          <span>Save Changes</span>
+        </button>
+        <button id="btn-lock" class="btn btn-sm btn-ghost" style="width: 100%; margin-top: 8px;">
+          <span>Lock Studio</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <!-- Top Bar -->
+      <div class="admin-topbar">
+        <div class="topbar-title-wrap">
+          <span class="topbar-kicker">CONTROL CENTER</span>
+          <h1 class="topbar-title" id="tab-active-title">Hot Announcement Banner</h1>
+        </div>
+        <div class="topbar-status">
+          <span class="pulse-dot"></span>
+          <span id="sync-status-text">LOCAL SYNC READY</span>
+        </div>
+      </div>
+
+      <!-- Tab 1: Announcement Banner -->
+      <section id="tab-announcement" class="admin-tab-pane active">
+        <div class="admin-card">
+          <h3 class="card-title">Promotional Top Banner</h3>
+          <p class="card-desc">Control the high-visibility alert bar displayed at the very top of belgray.com.</p>
+
+          <div class="form-row">
+            <label class="toggle-control">
+              <input type="checkbox" id="cfg-banner-enabled" checked>
+              <span class="toggle-switch"></span>
+              <span class="toggle-label">Enable Top Banner</span>
+            </label>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-banner-badge">Badge Label</label>
+              <input type="text" id="cfg-banner-badge" class="admin-input" value="OUT NOW" placeholder="e.g. OUT NOW, PRE-SAVE, TOUR">
+            </div>
+
+            <div class="form-group">
+              <label for="cfg-banner-btn-text">Button Text</label>
+              <input type="text" id="cfg-banner-btn-text" class="admin-input" value="Listen Now" placeholder="e.g. Listen Now, Pre-save">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-banner-text">Announcement Text</label>
+            <input type="text" id="cfg-banner-text" class="admin-input" value="EP 'Anxious Story' is out now worldwide on all streaming platforms" placeholder="Main alert message">
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-banner-link">Target Destination URL</label>
+            <input type="text" id="cfg-banner-link" class="admin-input" value="https://band.link/anxious_story" placeholder="https://band.link/...">
+          </div>
+
+          <div class="banner-preview-box">
+            <span class="preview-label">LIVE PREVIEW</span>
+            <div class="announcement-bar" style="border-radius: 6px;">
+              <div class="announcement-content">
+                <span class="announcement-badge" id="prev-banner-badge">OUT NOW</span>
+                <span class="announcement-text" id="prev-banner-text">EP 'Anxious Story' is out now worldwide on all streaming platforms</span>
+                <span class="announcement-link"><span id="prev-banner-btn">Listen Now</span> →</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Hero Section -->
+      <section id="tab-hero" class="admin-tab-pane">
+        <div class="admin-card">
+          <h3 class="card-title">Hero Section & Taglines</h3>
+          <p class="card-desc">Configure the opening statement, status pills, and primary call-to-action buttons.</p>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-hero-badge">Status Pill Label</label>
+              <input type="text" id="cfg-hero-badge" class="admin-input" value="PIANIST & ELECTRONIC PRODUCER">
+            </div>
+            <div class="form-group">
+              <label for="cfg-hero-title">Artist Main Title</label>
+              <input type="text" id="cfg-hero-title" class="admin-input" value="BEL GRAY">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-hero-subtitle">Hero Subtitle / Mission Statement</label>
+            <textarea id="cfg-hero-subtitle" class="admin-textarea" rows="2">Solo piano touch meeting the energy of melodic progressive house. Crafted by Daniel Belyaev.</textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-hero-cta1">Primary Button Label</label>
+              <input type="text" id="cfg-hero-cta1" class="admin-input" value="Listen to 'Anxious Story'">
+            </div>
+            <div class="form-group">
+              <label for="cfg-hero-cta2">Secondary Button Label</label>
+              <input type="text" id="cfg-hero-cta2" class="admin-input" value="Meet Daniel">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Releases Catalog -->
+      <section id="tab-releases" class="admin-tab-pane">
+        <div class="admin-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Discography & Featured Releases</h3>
+              <p class="card-desc">Add new singles, EPs, or albums without ever writing code.</p>
+            </div>
+            <button id="btn-toggle-add-release" class="btn btn-primary btn-sm">
+              <span>+ Add New Release</span>
+            </button>
+          </div>
+
+          <!-- Add Release Modal / Accordion -->
+          <div id="add-release-panel" class="add-release-panel" style="display: none;">
+            <h4 class="form-section-title">New Release Details</h4>
+
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="new-rel-title" class="admin-input" placeholder="e.g. To Be The Light">
+              </div>
+              <div class="form-group">
+                <label>Type</label>
+                <select id="new-rel-type" class="admin-select">
+                  <option value="Single">Single</option>
+                  <option value="EP" selected>EP</option>
+                  <option value="Album">Album</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Year</label>
+                <input type="text" id="new-rel-year" class="admin-input" value="2026">
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label>Cover Art Path or URL</label>
+                <input type="text" id="new-rel-cover" class="admin-input" value="assets/Anxious Story.jpg">
+              </div>
+              <div class="form-group">
+                <label>Status</label>
+                <select id="new-rel-status" class="admin-select">
+                  <option value="OUT NOW" selected>OUT NOW</option>
+                  <option value="PRE-SAVE">PRE-SAVE</option>
+                  <option value="COMING SOON">COMING SOON</option>
+                  <option value="CATALOG">CATALOG ARCHIVE</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Tagline / Narrative Concept</label>
+              <textarea id="new-rel-tagline" class="admin-textarea" rows="2" placeholder="Brief concept or musical journey..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Craft Architecture (Tech Spec)</label>
+              <select id="new-rel-craft" class="admin-select">
+                <option value="pure">Pure Studio Craft (FL Studio & Acoustic Piano)</option>
+                <option value="hybrid" selected>Hybrid Concept (Piano Core + Neural Vocal Synthesis + FL Studio)</option>
+                <option value="acoustic">Acoustic Piano Suite</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Smartlink (BandLink)</label>
+              <input type="text" id="new-rel-smartlink" class="admin-input" placeholder="https://band.link/...">
+            </div>
+
+            <div class="form-group">
+              <label class="toggle-control">
+                <input type="checkbox" id="new-rel-featured" checked>
+                <span class="toggle-switch"></span>
+                <span class="toggle-label">Set as Featured Release on Hero Section</span>
+              </label>
+            </div>
+
+            <div class="panel-actions">
+              <button id="btn-save-new-release" class="btn btn-primary btn-sm">
+                <span>Save to Catalog</span>
+              </button>
+              <button id="btn-cancel-add-release" class="btn btn-ghost btn-sm">
+                <span>Cancel</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Existing Releases List -->
+          <div id="releases-admin-list" class="releases-admin-list">
+            <!-- Populated via admin.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Bio & Portrait -->
+      <section id="tab-bio" class="admin-tab-pane">
+        <div class="admin-card">
+          <h3 class="card-title">The Producer — Biography & Portrait</h3>
+          <p class="card-desc">Update your artist photo, narrative biography, and artistic quote in 1 click.</p>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-bio-photo">Portrait Image Path / URL</label>
+              <input type="text" id="cfg-bio-photo" class="admin-input" value="assets/BGM Daniel Belyaev Photo.png">
+            </div>
+            <div class="form-group">
+              <label for="cfg-bio-cap-name">Badge Name</label>
+              <input type="text" id="cfg-bio-cap-name" class="admin-input" value="DANIEL BELYAEV">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-bio-lead">Headline / Opening Hook</label>
+            <input type="text" id="cfg-bio-lead" class="admin-input" value="Grounded in classical piano keys, engineered for the energy of electronic music.">
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-bio-p1">Biography — Paragraph 1</label>
+            <textarea id="cfg-bio-p1" class="admin-textarea" rows="3">Bel Gray is the artist alias of composer, electronic music producer, and pianist Daniel Belyaev. Built upon classical piano discipline and deep DAW engineering in FL Studio, every release is designed as an authentic emotional timeline.</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-bio-p2">Biography — Paragraph 2</label>
+            <textarea id="cfg-bio-p2" class="admin-textarea" rows="3">Most works across the catalog are purely handcrafted piano compositions and electronic synth productions. On select concept releases (like Anxious Story), neural voice synthesis and modern technology are orchestrated as creative instruments — where melodic architecture, harmony, and emotional weight always remain human-led.</textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-bio-quote">Philosophical Quote</label>
+              <input type="text" id="cfg-bio-quote" class="admin-input" value="And life is so beautiful, that’s all that counts. Just to heal this world and to be the light.">
+            </div>
+            <div class="form-group">
+              <label for="cfg-bio-quote-author">Quote Author</label>
+              <input type="text" id="cfg-bio-quote-author" class="admin-input" value="Bel Gray">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Documentary & Film -->
+      <section id="tab-media" class="admin-tab-pane">
+        <div class="admin-card">
+          <h3 class="card-title">Documentary & Media Hub</h3>
+          <p class="card-desc">Control the documentary archive block. If a release does not have a video, you can toggle it off.</p>
+
+          <div class="form-row">
+            <label class="toggle-control">
+              <input type="checkbox" id="cfg-doc-enabled" checked>
+              <span class="toggle-switch"></span>
+              <span class="toggle-label">Show Documentary / Behind The Storm Block</span>
+            </label>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-doc-badge">Badge Label</label>
+              <input type="text" id="cfg-doc-badge" class="admin-input" value="CREATIVE ARCHIVE">
+            </div>
+            <div class="form-group">
+              <label for="cfg-doc-title">Documentary Title</label>
+              <input type="text" id="cfg-doc-title" class="admin-input" value="Behind The Storm">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-doc-desc">Short Description</label>
+            <textarea id="cfg-doc-desc" class="admin-textarea" rows="2">The creative documentary tracing how a raw, stumbling phone recording evolved into the four-act conceptual EP 'Anxious Story'. Studio breakdown, piano progression, and visual framing.</textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-doc-btn-text">Button Text</label>
+              <input type="text" id="cfg-doc-btn-text" class="admin-input" value="Watch Documentary on Telegram">
+            </div>
+            <div class="form-group">
+              <label for="cfg-doc-link">Destination Link (Telegram or YouTube)</label>
+              <input type="text" id="cfg-doc-link" class="admin-input" value="https://t.me/belgray_music">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Theme & Colors -->
+      <section id="tab-theme" class="admin-tab-pane">
+        <div class="admin-card">
+          <h3 class="card-title">Era Accent Color Engine</h3>
+          <p class="card-desc">Set the signature visual color for the current music era. Buttons, glow shadows, borders, and sound waves automatically adapt.</p>
+
+          <div class="theme-presets-wrap">
+            <span class="field-label">Quick Era Presets:</span>
+            <div class="presets-row">
+              <button type="button" class="preset-pill active" data-color="#FF5722" style="--preset-c: #FF5722;">
+                <span>Anxious Story (Burnt Orange)</span>
+              </button>
+              <button type="button" class="preset-pill" data-color="#00E5FF" style="--preset-c: #00E5FF;">
+                <span>Electric Cyan</span>
+              </button>
+              <button type="button" class="preset-pill" data-color="#9D4EDD" style="--preset-c: #9D4EDD;">
+                <span>Deep Violet</span>
+              </button>
+              <button type="button" class="preset-pill" data-color="#00E676" style="--preset-c: #00E676;">
+                <span>Acid Green</span>
+              </button>
+              <button type="button" class="preset-pill" data-color="#E0E0E0" style="--preset-c: #E0E0E0;">
+                <span>Titanium White</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 24px;">
+            <label for="cfg-theme-color">Custom Hex Accent Color</label>
+            <div class="color-picker-input-group">
+              <input type="color" id="cfg-theme-picker" value="#FF5722" class="color-swatch-picker">
+              <input type="text" id="cfg-theme-color" class="admin-input" value="#FF5722" placeholder="#FF5722">
+            </div>
+          </div>
+
+          <div class="theme-preview-palette">
+            <span class="preview-label">ACTIVE THEME ACCENT DEMO</span>
+            <div class="palette-preview-card">
+              <button class="btn btn-primary">Primary Action Glow</button>
+              <button class="btn btn-outline">Outline Focus</button>
+              <div class="demo-tag">ERA // SPEC READY</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 4: Cloud & Supabase -->
+      <section id="tab-sync" class="admin-tab-pane">
+        <div class="admin-card">
+          <h3 class="card-title">Supabase Cloud Database Integration</h3>
+          <p class="card-desc">Connect free Supabase backend for instant updates from mobile, or download JSON files for Git.</p>
+
+          <div class="form-group">
+            <label for="cfg-supabase-url">Supabase Project URL</label>
+            <input type="text" id="cfg-supabase-url" class="admin-input" placeholder="https://your-project.supabase.co">
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-supabase-key">Supabase Anon Public Key</label>
+            <input type="password" id="cfg-supabase-key" class="admin-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+          </div>
+
+          <div class="sql-box">
+            <div class="sql-box-header">
+              <span class="field-label">1-CLICK SUPABASE SQL SCHEMA (RUN IN SQL EDITOR):</span>
+              <button id="btn-copy-sql" class="btn btn-sm btn-ghost">Copy SQL</button>
+            </div>
+            <pre class="sql-pre"><code>-- Create table for Bel Gray releases
+CREATE TABLE IF NOT EXISTS releases (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  type TEXT,
+  category TEXT,
+  year TEXT,
+  releaseDate TEXT,
+  coverUrl TEXT,
+  accentColor TEXT,
+  tagline TEXT,
+  isLatest BOOLEAN DEFAULT false,
+  status TEXT,
+  smartlink TEXT,
+  craftSpec JSONB,
+  tracklist JSONB,
+  links JSONB
+);
+
+-- Create table for Bel Gray site config
+CREATE TABLE IF NOT EXISTS site_config (
+  id TEXT PRIMARY KEY DEFAULT 'global',
+  data JSONB NOT NULL
+);</code></pre>
+          </div>
+
+          <div class="backup-actions-row" style="margin-top: 24px;">
+            <button id="btn-download-json" class="btn btn-outline">
+              <span>Export releases.json Backup</span>
+            </button>
+            <button id="btn-reset-defaults" class="btn btn-ghost">
+              <span>Reset to Defaults</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="admin-toast" class="admin-toast">Saved successfully!</div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
