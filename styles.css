@@ -1829,63 +1829,337 @@ button {
 }
 
 /* ==========================================================================
-   DOCUMENTARY / BTS (Behind The Storm)
+   DOCUMENTARY / 16:9 CINEMA POSTER SHOWCASE & BUILT-IN YOUTUBE PLAYER
    ========================================================================== */
 .film-section {
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.bts-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 56px 40px;
-  text-align: center;
+.doc-cinema-card {
   position: relative;
+  width: 100%;
+  min-height: 540px;
+  aspect-ratio: 16 / 9;
+  max-height: 660px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  padding: 36px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   overflow: hidden;
+  box-shadow:
+    0 28px 72px rgba(0, 0, 0, 0.72),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
-.bts-card::before {
-  content: '';
+.doc-cinema-card:hover {
+  border-color: var(--accent-border);
+  box-shadow:
+    0 32px 84px rgba(0, 0, 0, 0.82),
+    0 0 48px var(--accent-subtle),
+    0 0 0 1px var(--accent-border) inset;
+}
+
+/* Poster Backdrop + Vignette + Film Grain */
+.doc-poster-backdrop {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, var(--accent-glow) 0%, transparent 65%);
-  opacity: 0.25;
+  z-index: 0;
+  overflow: hidden;
   pointer-events: none;
 }
 
+.doc-poster-backdrop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  filter: saturate(0.88) contrast(1.08) brightness(0.55);
+  transform: scale(1.02);
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+}
+
+.doc-cinema-card:hover .doc-poster-backdrop img {
+  transform: scale(1.06);
+  filter: saturate(1.02) contrast(1.1) brightness(0.64);
+}
+
+.doc-poster-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(7, 7, 10, 0.78) 0%, rgba(7, 7, 10, 0.25) 42%, rgba(7, 7, 10, 0.92) 92%, rgba(7, 7, 10, 0.98) 100%),
+    radial-gradient(circle at 50% 44%, var(--accent-subtle) 0%, rgba(7, 7, 10, 0.65) 70%);
+}
+
+.doc-poster-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.14;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 0);
+  background-size: 24px 24px;
+  mix-blend-mode: overlay;
+}
+
+/* Top Bar: Badge & Spec Pills */
+.doc-cinema-topbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.doc-spec-pills {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.doc-spec-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(10, 10, 14, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.doc-spec-platform {
+  border-color: var(--accent-border);
+  color: var(--accent-color);
+  background: rgba(10, 10, 14, 0.82);
+}
+
+/* Center Play Stage */
+.doc-play-stage {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: auto 0;
+  padding: 24px 0;
+}
+
 .bts-play-circle {
-  width: 72px;
-  height: 72px;
+  position: relative;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
-  background: var(--accent-subtle);
-  border: 1px solid var(--accent-color);
+  background: rgba(12, 12, 18, 0.76);
+  border: 1.5px solid var(--accent-color);
   color: var(--accent-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 24px;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.65),
+    0 0 28px var(--accent-glow);
+  transition: transform var(--transition-smooth), background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   cursor: pointer;
 }
 
+.bts-play-circle svg {
+  margin-left: 3px;
+  position: relative;
+  z-index: 2;
+}
+
 .bts-play-circle:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 24px var(--accent-glow);
+  transform: scale(1.1);
+  background: var(--accent-color);
+  color: var(--accent-contrast, #FFFFFF);
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.75),
+    0 0 42px var(--accent-glow);
+}
+
+.play-pulse-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px solid var(--accent-color);
+  opacity: 0;
+  pointer-events: none;
+  animation: docPlayPulse 2.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.play-pulse-ring-2 {
+  animation-delay: 1.4s;
+}
+
+@keyframes docPlayPulse {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.65;
+  }
+  100% {
+    transform: scale(1.48);
+    opacity: 0;
+  }
+}
+
+.doc-play-caption {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+}
+
+/* Bottom Cinema Footer: Info + Action CTA */
+.doc-cinema-footer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.doc-cinema-info {
+  max-width: 680px;
+  text-align: left;
 }
 
 .bts-title {
-  font-size: clamp(24px, 3.2vw, 36px);
+  font-size: clamp(26px, 3.4vw, 40px);
   font-weight: 800;
-  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+  color: #FFFFFF;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.75);
 }
 
 .bts-desc {
-  color: var(--text-secondary);
+  color: rgba(242, 242, 247, 0.82);
   font-size: 15px;
-  max-width: 580px;
-  margin: 0 auto 28px;
-  line-height: 1.6;
+  line-height: 1.65;
+  margin: 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+
+.doc-cinema-cta-wrap {
+  flex-shrink: 0;
+}
+
+.doc-cta-btn {
+  padding: 15px 26px;
+  font-size: 13px;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.doc-btn-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+/* Built-In 16:9 YouTube Player Overlay */
+.doc-player-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: #050508;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.32s ease;
+}
+
+.doc-player-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.doc-player-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  background: rgba(10, 10, 15, 0.94);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.doc-player-live-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--accent-color);
+  text-transform: uppercase;
+}
+
+.doc-player-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.doc-player-close-btn {
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-medium);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.doc-player-close-btn:hover {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--accent-contrast, #FFFFFF);
+}
+
+.doc-iframe-mount {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #000;
+}
+
+.doc-iframe-mount iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 /* ==========================================================================
@@ -2170,6 +2444,20 @@ button {
   .footer-top-grid {
     grid-template-columns: 1fr;
     gap: 36px;
+  }
+  .doc-cinema-card {
+    aspect-ratio: auto;
+    min-height: 480px;
+    padding: 28px 24px;
+  }
+  .doc-cinema-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .doc-cinema-cta-wrap,
+  .doc-cta-btn {
+    width: 100%;
   }
 }
 

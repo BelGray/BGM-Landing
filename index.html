@@ -272,26 +272,79 @@
       </div>
     </section>
 
-    <!-- 7. Documentary Archive / BTS -->
+    <!-- 7. Documentary Archive / 16:9 Cinema Showcase & Player -->
     <section id="film" class="section film-section">
       <div class="container">
-        <div class="bts-card">
-          <a href="https://t.me/belgray_music" id="doc-link-play" target="_blank" rel="noopener noreferrer" class="bts-play-circle" aria-label="Watch Documentary">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </a>
-          <div class="section-tag" id="doc-badge">CREATIVE ARCHIVE</div>
-          <h2 class="bts-title" id="doc-title">Behind The Storm</h2>
-          <p class="bts-desc" id="doc-desc">
-            The creative documentary tracing how a raw, stumbling phone recording evolved into the four-act conceptual EP 'Anxious Story'. Studio breakdown, piano progression, and visual framing.
-          </p>
-          <a href="https://t.me/belgray_music" id="doc-btn" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-            <span id="doc-btn-text">Watch Documentary on Telegram</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.93-1.28 4.88-2.12 5.86-2.54 2.79-1.16 3.37-1.36 3.75-1.36.08 0 .28.02.4.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-            </svg>
-          </a>
+        <div class="doc-cinema-card" id="doc-cinema-card">
+          <!-- Cinematic Backdrop Poster -->
+          <div class="doc-poster-backdrop" aria-hidden="true">
+            <img id="doc-poster-img" src="assets/BGM Daniel Belyaev Photo.png" alt="Documentary Poster" loading="lazy">
+            <div class="doc-poster-vignette"></div>
+            <div class="doc-poster-grain"></div>
+          </div>
+
+          <!-- Built-In 16:9 YouTube Video Player Overlay (Activated when link is a YouTube video) -->
+          <div class="doc-player-overlay" id="doc-player-overlay" aria-hidden="true">
+            <div class="doc-player-topbar">
+              <span class="doc-player-live-tag">
+                <span class="pulse-dot"></span>
+                <span>NOW SCREENING</span>
+              </span>
+              <div class="doc-player-actions">
+                <a href="https://youtube.com/@belgray_music" id="doc-player-external" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-ghost">
+                  <span>Open on YouTube ↗</span>
+                </a>
+                <button type="button" id="doc-player-close" class="doc-player-close-btn" aria-label="Close video player">
+                  ✕ Close Player
+                </button>
+              </div>
+            </div>
+            <div class="doc-iframe-mount" id="doc-iframe-mount"></div>
+          </div>
+
+          <!-- Top Cinema Bar: Tag & Technical Specs -->
+          <div class="doc-cinema-topbar">
+            <div class="section-tag" id="doc-badge" style="margin-bottom: 0;">CREATIVE ARCHIVE</div>
+            <div class="doc-spec-pills">
+              <span class="doc-spec-pill" id="doc-spec-meta">4K • STUDIO BREAKDOWN</span>
+              <span class="doc-spec-pill doc-spec-platform">
+                <span class="pulse-dot"></span>
+                <span id="doc-platform-badge">YOUTUBE FILM</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Center Play Trigger Stage -->
+          <div class="doc-play-stage">
+            <a href="https://youtube.com/@belgray_music" id="doc-link-play" target="_blank" rel="noopener noreferrer" class="bts-play-circle" aria-label="Watch Documentary">
+              <span class="play-pulse-ring play-pulse-ring-1" aria-hidden="true"></span>
+              <span class="play-pulse-ring play-pulse-ring-2" aria-hidden="true"></span>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </a>
+            <span class="doc-play-caption" id="doc-play-caption">PRESS TO WATCH DOCUMENTARY</span>
+          </div>
+
+          <!-- Bottom Cinema Info & CTA Bar -->
+          <div class="doc-cinema-footer">
+            <div class="doc-cinema-info">
+              <h2 class="bts-title" id="doc-title">Behind The Anxious Story</h2>
+              <p class="bts-desc" id="doc-desc">
+                The creative documentary tracing how a raw, stumbling phone recording evolved into the four-act conceptual EP 'Anxious Story'. Studio breakdown, piano progression, and visual framing.
+              </p>
+            </div>
+            <div class="doc-cinema-cta-wrap">
+              <a href="https://youtube.com/@belgray_music" id="doc-btn" target="_blank" rel="noopener noreferrer" class="btn btn-primary doc-cta-btn">
+                <span id="doc-btn-text">Watch Documentary on YouTube</span>
+                <span id="doc-btn-icon" class="doc-btn-icon-wrap" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.07 0 12 0 12s0 3.93.5 5.81a3.02 3.02 0 0 0 2.12 2.14c1.88.55 9.38.55 9.38.55s7.5 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.93 24 12 24 12s0-3.93-.5-5.81zM9.54 15.57V8.43L15.82 12l-6.28 3.57z"/>
+                  </svg>
+                </span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>

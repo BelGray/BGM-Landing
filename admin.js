@@ -241,10 +241,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     documentary: {
       enabled: true,
       badge: "CREATIVE ARCHIVE",
-      title: "Behind The Storm",
+      title: "Behind The Anxious Story",
+      spec: "4K • STUDIO BREAKDOWN",
+      posterUrl: "assets/BGM Daniel Belyaev Photo.png",
       description: "The creative documentary tracing how a raw, stumbling phone recording evolved into the four-act conceptual EP 'Anxious Story'. Studio breakdown, piano progression, and visual framing.",
-      buttonText: "Watch Documentary on Telegram",
-      link: "https://t.me/belgray_music"
+      buttonText: "Watch Documentary on YouTube",
+      link: "https://youtube.com/@belgray_music"
     },
     socials: {
       telegram: "https://t.me/belgray_music",
@@ -453,6 +455,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const docEnabled = document.getElementById('cfg-doc-enabled');
   const docBadge = document.getElementById('cfg-doc-badge');
   const docTitle = document.getElementById('cfg-doc-title');
+  const docSpec = document.getElementById('cfg-doc-spec');
+  const docPoster = document.getElementById('cfg-doc-poster');
   const docDesc = document.getElementById('cfg-doc-desc');
   const docBtnText = document.getElementById('cfg-doc-btn-text');
   const docLink = document.getElementById('cfg-doc-link');
@@ -462,6 +466,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (docEnabled) docEnabled.checked = d.enabled !== false;
     if (docBadge) docBadge.value = d.badge || defaultSiteConfig.documentary.badge;
     if (docTitle) docTitle.value = d.title || defaultSiteConfig.documentary.title;
+    if (docSpec) docSpec.value = d.spec || defaultSiteConfig.documentary.spec;
+    if (docPoster) docPoster.value = d.posterUrl !== undefined ? d.posterUrl : defaultSiteConfig.documentary.posterUrl;
     if (docDesc) docDesc.value = d.description || defaultSiteConfig.documentary.description;
     if (docBtnText) docBtnText.value = d.buttonText || defaultSiteConfig.documentary.buttonText;
     if (docLink) docLink.value = d.link || defaultSiteConfig.documentary.link;
@@ -1039,6 +1045,8 @@ CREATE POLICY "Admin Write Config" ON site_config FOR ALL TO authenticated USING
         enabled: docEnabled.checked,
         badge: docBadge.value.trim() || defaultSiteConfig.documentary.badge,
         title: docTitle.value.trim() || defaultSiteConfig.documentary.title,
+        spec: docSpec ? (docSpec.value.trim() || defaultSiteConfig.documentary.spec) : defaultSiteConfig.documentary.spec,
+        posterUrl: docPoster ? sanitizeUrl(docPoster.value.trim(), '') : defaultSiteConfig.documentary.posterUrl,
         description: docDesc.value.trim() || defaultSiteConfig.documentary.description,
         buttonText: docBtnText.value.trim() || defaultSiteConfig.documentary.buttonText,
         link: sanitizeUrl(docLink.value.trim(), defaultSiteConfig.documentary.link)

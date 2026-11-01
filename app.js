@@ -235,10 +235,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     documentary: {
       enabled: true,
       badge: "CREATIVE ARCHIVE",
-      title: "Behind The Storm",
+      title: "Behind The Anxious Story",
+      spec: "4K • STUDIO BREAKDOWN",
+      posterUrl: "assets/BGM Daniel Belyaev Photo.png",
       description: "The creative documentary tracing how a raw, stumbling phone recording evolved into the four-act conceptual EP 'Anxious Story'. Studio breakdown, piano progression, and visual framing.",
-      buttonText: "Watch Documentary on Telegram",
-      link: "https://t.me/belgray_music"
+      buttonText: "Watch Documentary on YouTube",
+      link: "https://youtube.com/@belgray_music"
     },
     socials: {
       telegram: "https://t.me/belgray_music",
@@ -1169,7 +1171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    // Documentary Section
+    // Documentary Section (16:9 Cinema Poster Showcase + Built-in YouTube Player)
     const filmSection = document.getElementById('film');
     const filmNavLink = document.querySelector('.desktop-nav a[href="#film"]');
     if (filmSection) {
@@ -1180,19 +1182,159 @@ document.addEventListener('DOMContentLoaded', async () => {
         filmSection.style.display = 'block';
         if (filmNavLink) filmNavLink.style.display = '';
         const docBadge = document.getElementById('doc-badge');
+        const docSpecMeta = document.getElementById('doc-spec-meta');
+        const docPlatformBadge = document.getElementById('doc-platform-badge');
+        const docPosterImg = document.getElementById('doc-poster-img');
         const docTitle = document.getElementById('doc-title');
         const docDesc = document.getElementById('doc-desc');
         const docBtn = document.getElementById('doc-btn');
         const docBtnText = document.getElementById('doc-btn-text');
+        const docBtnIcon = document.getElementById('doc-btn-icon');
         const docLinkPlay = document.getElementById('doc-link-play');
+        const docPlayCaption = document.getElementById('doc-play-caption');
+        const docPlayerOverlay = document.getElementById('doc-player-overlay');
+        const docIframeMount = document.getElementById('doc-iframe-mount');
+        const docPlayerClose = document.getElementById('doc-player-close');
+        const docPlayerExternal = document.getElementById('doc-player-external');
 
-        const safeDocUrl = sanitizeUrl(cfg.documentary.link, 'https://t.me/belgray_music');
+        const rawLink = String(cfg.documentary.link || '').trim();
+        const rawBtnText = String(cfg.documentary.buttonText || 'Watch Documentary on YouTube').trim();
+        const lowerLink = rawLink.toLowerCase();
+        const lowerBtnText = rawBtnText.toLowerCase();
+
+        // Detect intended platform from URL or button text (fixes mismatch if user edited button text to YouTube)
+        const mentionsYouTube = lowerLink.includes('youtube.com') || lowerLink.includes('youtu.be') || lowerBtnText.includes('youtube') || lowerBtnText.includes('ютуб');
+        const mentionsVk = lowerLink.includes('vk.com') || lowerLink.includes('vkvideo') || lowerBtnText.includes('vk') || lowerBtnText.includes('вк');
+        const mentionsTelegram = (lowerLink.includes('t.me') || lowerLink.includes('telegram') || lowerBtnText.includes('telegram') || lowerBtnText.includes('телеграм')) && !mentionsYouTube;
+
+        // If user set button text to YouTube while link was still the old default Telegram URL, resolve to YouTube channel
+        let resolvedLink = rawLink;
+        if (mentionsYouTube && (!rawLink || lowerLink === 'https://t.me/belgray_music')) {
+          resolvedLink = (cfg.socials && cfg.socials.youtube) ? cfg.socials.youtube : 'https://youtube.com/@belgray_music';
+        }
+        const safeDocUrl = sanitizeUrl(resolvedLink, 'https://youtube.com/@belgray_music');
+
+        // Extract YouTube Video ID if the link points to a specific YouTube video
+        const ytMatch = safeDocUrl.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+        const ytVideoId = ytMatch ? ytMatch[1] : null;
+
         if (docBadge && cfg.documentary.badge) docBadge.textContent = cfg.documentary.badge;
-        if (docTitle && cfg.documentary.title) docTitle.textContent = cfg.documentary.title;
+        if (docSpecMeta) {
+          docSpecMeta.textContent = (cfg.documentary.spec && cfg.documentary.spec.trim())
+            ? cfg.documentary.spec.trim()
+            : '4K • STUDIO BREAKDOWN';
+        }
+        if (docTitle) {
+          // Auto-upgrade legacy default title "Behind The Storm" -> "Behind The Anxious Story"
+          const rawTitle = (cfg.documentary.title || '').trim();
+          docTitle.textContent = (!rawTitle || rawTitle === 'Behind The Storm')
+            ? 'Behind The Anxious Story'
+            : rawTitle;
+        }
         if (docDesc && cfg.documentary.description) docDesc.textContent = cfg.documentary.description;
+        if (docBtnText) docBtnText.textContent = rawBtnText;
+
+        // Set platform badge & matching SVG button icon (no more Telegram icon on YouTube button!)
+        const platformIcons = {
+          youtube: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.07 0 12 0 12s0 3.93.5 5.81a3.02 3.02 0 0 0 2.12 2.14c1.88.55 9.38.55 9.38.55s7.5 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.93 24 12 24 12s0-3.93-.5-5.81zM9.54 15.57V8.43L15.82 12l-6.28 3.57z"/></svg>`,
+          telegram: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>`,
+          vk: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.78 19.55c-5.46 0-8.58-3.75-8.71-9.99h2.74c.09 4.58 2.11 6.52 3.71 6.92V9.56h2.58v3.95c1.58-.17 3.24-1.97 3.8-3.95h2.58c-.43 2.44-2.23 4.24-3.51 4.98 1.28.6 3.33 2.17 4.11 5.01h-2.84c-.61-1.9-2.13-3.37-4.14-3.57v3.57h-.32z"/></svg>`,
+          external: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`
+        };
+
+        let platformKey = 'external';
+        let platformLabel = 'DOCUMENTARY FILM';
+        if (mentionsYouTube) {
+          platformKey = 'youtube';
+          platformLabel = ytVideoId ? 'YOUTUBE • INLINE PLAYER' : 'YOUTUBE FILM';
+        } else if (mentionsTelegram) {
+          platformKey = 'telegram';
+          platformLabel = 'TELEGRAM PREMIERE';
+        } else if (mentionsVk) {
+          platformKey = 'vk';
+          platformLabel = 'VK VIDEO';
+        }
+
+        if (docBtnIcon) docBtnIcon.innerHTML = platformIcons[platformKey];
+        if (docPlatformBadge) docPlatformBadge.textContent = platformLabel;
+        if (docPlayCaption) {
+          docPlayCaption.textContent = ytVideoId
+            ? 'PLAY IN BUILT-IN CINEMA PLAYER'
+            : 'PRESS TO WATCH DOCUMENTARY';
+        }
+
+        // Poster image: custom poster -> YouTube maxresdefault (if video ID) -> fallback studio portrait
+        if (docPosterImg) {
+          const customPoster = (cfg.documentary.posterUrl || '').trim();
+          const defaultPortrait = 'assets/BGM Daniel Belyaev Photo.png';
+          if (ytVideoId && (!customPoster || customPoster === defaultPortrait)) {
+            docPosterImg.src = `https://i.ytimg.com/vi/${ytVideoId}/maxresdefault.jpg`;
+            docPosterImg.onerror = () => {
+              docPosterImg.onerror = null;
+              docPosterImg.src = defaultPortrait;
+            };
+          } else {
+            docPosterImg.src = sanitizeUrl(customPoster || defaultPortrait, defaultPortrait);
+            docPosterImg.onerror = () => {
+              docPosterImg.onerror = null;
+              docPosterImg.src = defaultPortrait;
+            };
+          }
+        }
+
         if (docBtn) docBtn.href = safeDocUrl;
         if (docLinkPlay) docLinkPlay.href = safeDocUrl;
-        if (docBtnText && cfg.documentary.buttonText) docBtnText.textContent = cfg.documentary.buttonText;
+        if (docPlayerExternal) docPlayerExternal.href = safeDocUrl;
+
+        // Close inline player helper
+        const closeInlineDocPlayer = () => {
+          if (!docPlayerOverlay || !docIframeMount) return;
+          docPlayerOverlay.classList.remove('active');
+          docPlayerOverlay.setAttribute('aria-hidden', 'true');
+          docIframeMount.innerHTML = '';
+        };
+
+        // Open inline 16:9 YouTube player when a YouTube video ID is available
+        const openInlineDocPlayer = (e) => {
+          if (!ytVideoId || !docPlayerOverlay || !docIframeMount) return;
+          e.preventDefault();
+          stopCurrentAudio();
+          docIframeMount.innerHTML = `
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytVideoId)}?autoplay=1&rel=0&modestbranding=1"
+              title="${escapeHtml(docTitle ? docTitle.textContent : 'Bel Gray Documentary')}"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          `;
+          docPlayerOverlay.classList.add('active');
+          docPlayerOverlay.setAttribute('aria-hidden', 'false');
+        };
+
+        if (docLinkPlay) {
+          docLinkPlay.onclick = ytVideoId ? openInlineDocPlayer : null;
+        }
+        if (docBtn) {
+          docBtn.onclick = ytVideoId ? openInlineDocPlayer : null;
+        }
+        if (docPlayerClose) {
+          docPlayerClose.onclick = closeInlineDocPlayer;
+        }
+        if (!window.__docEscBound) {
+          window.__docEscBound = true;
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+              const activeOverlay = document.getElementById('doc-player-overlay');
+              const mount = document.getElementById('doc-iframe-mount');
+              if (activeOverlay && activeOverlay.classList.contains('active')) {
+                activeOverlay.classList.remove('active');
+                activeOverlay.setAttribute('aria-hidden', 'true');
+                if (mount) mount.innerHTML = '';
+              }
+            }
+          });
+        }
       }
     }
   };

@@ -49,10 +49,12 @@
   "documentary": {
     "enabled": true,
     "badge": "CREATIVE ARCHIVE",
-    "title": "Behind The Storm",
+    "title": "Behind The Anxious Story",
+    "spec": "4K • STUDIO BREAKDOWN",
+    "posterUrl": "assets/BGM Daniel Belyaev Photo.png",
     "description": "The creative documentary tracing how a raw, stumbling phone recording evolved into the four-act conceptual EP 'Anxious Story'. Studio breakdown, piano progression, and visual framing.",
-    "buttonText": "Watch Documentary on Telegram",
-    "link": "https://t.me/belgray_music"
+    "buttonText": "Watch Documentary on YouTube",
+    "link": "https://youtube.com/@belgray_music"
   },
   "socials": {
     "telegram": "https://t.me/belgray_music",
