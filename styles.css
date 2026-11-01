@@ -1096,7 +1096,8 @@ button {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
 .release-type-badge {
@@ -1113,6 +1114,23 @@ button {
   color: var(--text-muted);
 }
 
+/* Highlighted Pill Next to Year when Release is Upcoming (COMING SOON / PRE-SAVE) */
+.release-date-upcoming-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent-border);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
 .featured-title {
   font-size: clamp(32px, 3.5vw, 44px);
   font-weight: 800;
@@ -1124,6 +1142,86 @@ button {
   font-size: 15px;
   color: var(--text-secondary);
   line-height: 1.6;
+}
+
+/* Upcoming Release Drop Callout Banner (Shown automatically for COMING SOON / PRE-SAVE) */
+.upcoming-drop-banner {
+  margin: 18px 0 14px;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--accent-subtle) 0%, rgba(20, 20, 28, 0.92) 100%);
+  border: 1px solid var(--accent-border);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 0 22px var(--accent-glow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.upcoming-drop-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.upcoming-calendar-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-xs);
+  background: var(--accent-color);
+  color: var(--accent-contrast, #FFFFFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.upcoming-drop-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.upcoming-drop-kicker {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--accent-color);
+  text-transform: uppercase;
+}
+
+.upcoming-drop-date {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.upcoming-drop-date strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.upcoming-iso-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.upcoming-countdown-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  background: var(--accent-color);
+  color: var(--accent-contrast, #FFFFFF);
+  box-shadow: 0 0 16px var(--accent-glow);
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* Production Spec / Craft Pill */
@@ -1378,26 +1476,22 @@ button {
   margin-right: 4px;
 }
 
-.featured-streaming-strip {
+.featured-streaming-viewport {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  padding: 6px 2px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+}
+
+.featured-streaming-track {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 100%;
-  min-width: 0;
-  overflow-x: auto;
-  padding: 6px 2px 10px;
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-medium) transparent;
-}
-
-.featured-streaming-strip::-webkit-scrollbar {
-  height: 4px;
-}
-
-.featured-streaming-strip::-webkit-scrollbar-thumb {
-  background: var(--border-medium);
-  border-radius: 4px;
+  width: max-content;
+  will-change: transform;
 }
 
 .featured-stream-card {

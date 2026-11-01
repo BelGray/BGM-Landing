@@ -523,6 +523,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (playerTime) playerTime.textContent = '00:00';
   };
 
+  // Helper: Parse & Format Release Drop Date for Upcoming Releases (COMING SOON / PRE-SAVE)
+  const getReleaseDropStatus = (release) => {
+    const rawStatus = String(release?.status || 'OUT NOW').toUpperCase().trim();
+    const isUpcoming = rawStatus === 'COMING SOON' || rawStatus === 'PRE-SAVE';
+    const rawDate = String(release?.releaseDate || '').trim();
+
+    let formattedDate = rawDate || 'TBA';
+    let countdownLabel = rawStatus === 'PRE-SAVE' ? 'PRE-SAVE OPEN' : 'COMING SOON';
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+      const [y, m, d] = rawDate.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      if (!isNaN(dt.getTime())) {
+        formattedDate = dt.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+
+        const now = new Date();
+        const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const diffDays = Math.round((dt.getTime() - todayMidnight.getTime()) / 86400000);
+
+        if (diffDays > 1) {
+          countdownLabel = `IN ${diffDays} DAYS`;
+        } else if (diffDays === 1) {
+          countdownLabel = 'DROPS TOMORROW';
+        } else if (diffDays === 0) {
+          countdownLabel = 'DROPS TODAY';
+        }
+      }
+    }
+
+    return {
+      isUpcoming,
+      rawStatus,
+      rawDate,
+      formattedDate,
+      countdownLabel
+    };
+  };
+
   // 7. Render Featured Release (Round Picture-Disc Vinyl -> 3D Pop-Out Cover + Streaming Carousel)
   const renderFeatured = (release) => {
     const mount = document.getElementById('latest-release-mount');
@@ -533,6 +575,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Global Era Color from Studio Theme tab takes priority, falling back to release accentColor
     const activeColor = siteConfig.site?.activeEraColor || release.accentColor || '#FF5722';
     applyThemeColor(activeColor);
+
+    const dropInfo = getReleaseDropStatus(release);
 
     const tracksHtml = (release.tracklist || []).map((t, idx) => `
       <div class="track-item" data-track-index="${idx}">
@@ -553,11 +597,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const safeCover = sanitizeUrl(release.coverUrl, 'assets/Anxious Story.jpg');
     const safeSmartlink = sanitizeUrl(release.smartlink, 'https://band.link/anxious_story');
+    const primaryCtaText = dropInfo.isUpcoming ? 'Pre-Save on BandLink' : 'Stream on BandLink';
 
-    const featuredPlatformsHtml = STREAMING_PLATFORMS.map(p => {
+    const featuredLoopList = [...STREAMING_PLATFORMS, ...STREAMING_PLATFORMS];
+    const featuredPlatformsHtml = featuredLoopList.map((p, idx) => {
       const url = resolvePlatformUrl(p, release);
+      const isClone = idx >= STREAMING_PLATFORMS.length;
       return `
-        <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="featured-stream-card">
+        <a href="${escapeHtml(url)}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="featured-stream-card"
+           ${isClone ? 'aria-hidden="true" tabindex="-1"' : ''}>
           <img src="${escapeHtml(p.icon)}" alt="${escapeHtml(p.name)}" class="featured-stream-logo" loading="lazy">
           <div class="featured-stream-meta">
             <span class="featured-stream-tier stream-tier-badge">${escapeHtml(p.tierBadge)}</span>
@@ -569,7 +620,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }).join('');
 
     mount.innerHTML = `
-      <article class="featured-card">
+      <article class="featured-card ${dropInfo.isUpcoming ? 'is-upcoming-release' : ''}">
         <!-- Left Column: Strictly 1:1 Round Vinyl with Album Cover -> 3D Close-Up Cover on Hover -->
         <div class="featured-cover-box" id="featured-cover-stage">
           <div class="cover-ambient-halo" aria-hidden="true"></div>
@@ -601,10 +652,40 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="featured-header">
             <div class="meta-row">
               <span class="release-type-badge">${escapeHtml(release.type)} • ${escapeHtml(release.year)}</span>
-              <span class="release-date-text">${escapeHtml(release.releaseDate || '')}</span>
+              ${dropInfo.isUpcoming ? `
+                <span class="release-date-upcoming-pill">
+                  <span class="pulse-dot"></span>
+                  <span>EXPECTED: ${escapeHtml(dropInfo.rawDate || 'SOON')}</span>
+                </span>
+              ` : (dropInfo.rawDate ? `
+                <span class="release-date-text">${escapeHtml(dropInfo.rawDate)}</span>
+              ` : '')}
             </div>
             <h3 class="featured-title">${escapeHtml(release.title)}</h3>
             <p class="featured-desc">${escapeHtml(release.tagline || '')}</p>
+
+            ${dropInfo.isUpcoming ? `
+              <div class="upcoming-drop-banner">
+                <div class="upcoming-drop-left">
+                  <div class="upcoming-calendar-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </div>
+                  <div class="upcoming-drop-info">
+                    <span class="upcoming-drop-kicker">${escapeHtml(dropInfo.rawStatus)} // EXPECTED RELEASE DATE</span>
+                    <span class="upcoming-drop-date">
+                      Drops on <strong>${escapeHtml(dropInfo.formattedDate)}</strong>
+                      ${dropInfo.rawDate && dropInfo.formattedDate !== dropInfo.rawDate ? `<span class="upcoming-iso-sub">(${escapeHtml(dropInfo.rawDate)})</span>` : ''}
+                    </span>
+                  </div>
+                </div>
+                <span class="upcoming-countdown-badge">${escapeHtml(dropInfo.countdownLabel)}</span>
+              </div>
+            ` : ''}
 
             ${release.craftSpec ? `
               <div class="craft-spec-box">
@@ -639,7 +720,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="featured-streaming-hub">
             <div class="featured-streaming-top">
               <a href="${escapeHtml(safeSmartlink)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-                <span>Stream on BandLink</span>
+                <span>${escapeHtml(primaryCtaText)}</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-7.85-1.42 1.42L16.86 11H5v2z"/>
                 </svg>
@@ -651,8 +732,10 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
             </div>
 
-            <div class="featured-streaming-strip" id="featured-streaming-strip">
-              ${featuredPlatformsHtml}
+            <div class="featured-streaming-viewport" id="featured-streaming-viewport">
+              <div class="featured-streaming-track" id="featured-streaming-strip">
+                ${featuredPlatformsHtml}
+              </div>
             </div>
           </div>
         </div>
@@ -694,22 +777,62 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   };
 
+  let featCarouselRaf = null;
+  let featCarouselOffset = 0;
+  let featCarouselPaused = false;
+
   const setupFeaturedStripControls = () => {
-    const strip = document.getElementById('featured-streaming-strip');
+    if (featCarouselRaf) {
+      cancelAnimationFrame(featCarouselRaf);
+      featCarouselRaf = null;
+    }
+    featCarouselOffset = 0;
+    featCarouselPaused = false;
+
+    const viewport = document.getElementById('featured-streaming-viewport');
+    const track = document.getElementById('featured-streaming-strip');
     const prev = document.getElementById('feat-stream-prev');
     const next = document.getElementById('feat-stream-next');
-    if (!strip) return;
+    if (!viewport || !track) return;
+
+    viewport.addEventListener('mouseenter', () => {
+      featCarouselPaused = true;
+    });
+    viewport.addEventListener('mouseleave', () => {
+      featCarouselPaused = false;
+    });
+
+    const stepFeatCarousel = (deltaPx) => {
+      const halfWidth = track.scrollWidth / 2;
+      if (halfWidth <= 0) return;
+      featCarouselOffset += deltaPx;
+      if (featCarouselOffset >= halfWidth) featCarouselOffset -= halfWidth;
+      if (featCarouselOffset < 0) featCarouselOffset += halfWidth;
+      track.style.transform = `translate3d(${-featCarouselOffset.toFixed(1)}px, 0, 0)`;
+    };
 
     if (prev) {
-      prev.addEventListener('click', () => {
-        strip.scrollBy({ left: -240, behavior: 'smooth' });
-      });
+      prev.addEventListener('click', () => stepFeatCarousel(-200));
     }
     if (next) {
-      next.addEventListener('click', () => {
-        strip.scrollBy({ left: 240, behavior: 'smooth' });
-      });
+      next.addEventListener('click', () => stepFeatCarousel(200));
     }
+
+    const animateFeatStrip = () => {
+      if (!featCarouselPaused) {
+        const halfWidth = track.scrollWidth / 2;
+        if (halfWidth > 0) {
+          featCarouselOffset += 0.48;
+          if (featCarouselOffset >= halfWidth) {
+            featCarouselOffset -= halfWidth;
+          }
+          track.style.transform = `translate3d(${-featCarouselOffset.toFixed(2)}px, 0, 0)`;
+        }
+      }
+      featCarouselRaf = requestAnimationFrame(animateFeatStrip);
+    };
+
+    featCarouselRaf = requestAnimationFrame(animateFeatStrip);
   };
 
   // 8. Setup Audio Engine & Streaming Redirect Modal
@@ -878,23 +1001,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     mount.innerHTML = items.map(item => {
       const safeCover = sanitizeUrl(item.coverUrl, 'assets/Anxious Story.jpg');
       const safeSmartlink = sanitizeUrl(item.smartlink, 'https://band.link/anxious_story');
+      const dropInfo = getReleaseDropStatus(item);
       return `
         <article class="release-card" data-category="${escapeHtml(item.category || 'ep')}">
           <div class="release-card-cover">
             <img src="${escapeHtml(safeCover)}" alt="${escapeHtml(item.title)}" loading="lazy">
+            ${dropInfo.isUpcoming ? `<div class="cover-badge-top">${escapeHtml(dropInfo.rawStatus)}</div>` : ''}
           </div>
           <div class="release-card-meta">
             <span class="release-card-type">${escapeHtml(item.type)}</span>
-            <span class="release-card-year">${escapeHtml(item.year)}</span>
+            <span class="release-card-year">${escapeHtml(item.year)}${item.releaseDate ? ' • ' + escapeHtml(item.releaseDate) : ''}</span>
           </div>
           <h4 class="release-card-title">${escapeHtml(item.title)}</h4>
           <div class="release-card-craft">
             <span>•</span>
-            <span>${escapeHtml(item.craftSpec ? item.craftSpec.badge : 'Studio Engineering')}</span>
+            <span>${escapeHtml(dropInfo.isUpcoming ? `Expected: ${dropInfo.formattedDate}` : (item.craftSpec ? item.craftSpec.badge : 'Studio Engineering'))}</span>
           </div>
           <div class="release-card-action">
-            <a href="${escapeHtml(safeSmartlink)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-ghost" style="width: 100%;">
-              Open Release
+            <a href="${escapeHtml(safeSmartlink)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm ${dropInfo.isUpcoming ? 'btn-outline' : 'btn-ghost'}" style="width: 100%;">
+              ${dropInfo.isUpcoming ? 'Pre-Save / Preview' : 'Open Release'}
             </a>
           </div>
         </article>

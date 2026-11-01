@@ -238,7 +238,7 @@
             <h4 class="form-section-title" id="release-form-heading">Release Details</h4>
             <input type="hidden" id="edit-rel-index" value="-1">
 
-            <div class="form-grid-3">
+            <div class="form-grid-2">
               <div class="form-group">
                 <label>Title</label>
                 <input type="text" id="new-rel-title" class="admin-input" value="Anxious Story" placeholder="e.g. Anxious Story">
@@ -251,26 +251,34 @@
                   <option value="Album">Album</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label>Year</label>
-                <input type="text" id="new-rel-year" class="admin-input" value="2026">
-              </div>
             </div>
 
-            <div class="form-grid-2">
+            <div class="form-grid-3">
               <div class="form-group">
-                <label>Cover Art Path or URL</label>
-                <input type="text" id="new-rel-cover" class="admin-input" value="assets/Anxious Story.jpg">
+                <label>Year</label>
+                <input type="text" id="new-rel-year" class="admin-input" value="2026" placeholder="2026">
+              </div>
+              <div class="form-group">
+                <label>Release Date (Next to Year)</label>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <input type="text" id="new-rel-date" class="admin-input" value="2026-10-21" placeholder="YYYY-MM-DD or e.g. Nov 15" style="flex: 1;">
+                  <input type="date" id="new-rel-date-picker" class="admin-input" value="2026-10-21" title="Pick date from calendar" style="width: 42px; padding: 8px 6px; cursor: pointer; flex-shrink: 0;">
+                </div>
               </div>
               <div class="form-group">
                 <label>Status</label>
                 <select id="new-rel-status" class="admin-select">
                   <option value="OUT NOW" selected>OUT NOW</option>
-                  <option value="PRE-SAVE">PRE-SAVE</option>
-                  <option value="COMING SOON">COMING SOON</option>
+                  <option value="PRE-SAVE">PRE-SAVE (Upcoming)</option>
+                  <option value="COMING SOON">COMING SOON (Upcoming)</option>
                   <option value="CATALOG">CATALOG ARCHIVE</option>
                 </select>
               </div>
+            </div>
+
+            <div class="form-group">
+              <label>Cover Art Path or URL</label>
+              <input type="text" id="new-rel-cover" class="admin-input" value="assets/Anxious Story.jpg">
             </div>
 
             <div class="form-group">

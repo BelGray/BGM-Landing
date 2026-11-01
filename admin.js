@@ -563,6 +563,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const relTitleInput = document.getElementById('new-rel-title');
   const relTypeSelect = document.getElementById('new-rel-type');
   const relYearInput = document.getElementById('new-rel-year');
+  const relDateInput = document.getElementById('new-rel-date');
+  const relDatePicker = document.getElementById('new-rel-date-picker');
   const relCoverInput = document.getElementById('new-rel-cover');
   const relStatusSelect = document.getElementById('new-rel-status');
   const relTaglineInput = document.getElementById('new-rel-tagline');
@@ -572,6 +574,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   const relFeaturedCheckbox = document.getElementById('new-rel-featured');
   const tracklistRowsMount = document.getElementById('admin-tracklist-rows');
   const btnAddTrackRow = document.getElementById('btn-add-track-row');
+
+  if (relDatePicker && relDateInput) {
+    relDatePicker.addEventListener('change', () => {
+      if (relDatePicker.value) {
+        relDateInput.value = relDatePicker.value;
+        const pickedYear = relDatePicker.value.split('-')[0];
+        if (pickedYear && /^\d{4}$/.test(pickedYear) && relYearInput) {
+          relYearInput.value = pickedYear;
+        }
+      }
+    });
+    relDateInput.addEventListener('input', () => {
+      const val = relDateInput.value.trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+        relDatePicker.value = val;
+      }
+    });
+  }
 
   let editingTracks = [];
 
@@ -639,13 +659,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const openReleaseFormForAdd = () => {
+    const todayIso = new Date().toISOString().split('T')[0];
     if (editRelIndexInput) editRelIndexInput.value = '-1';
     if (formHeading) formHeading.textContent = 'Add New Release';
     if (btnSaveReleaseLabel) btnSaveReleaseLabel.textContent = 'Save New Release';
 
     if (relTitleInput) relTitleInput.value = 'New Single';
     if (relTypeSelect) relTypeSelect.value = 'Single';
-    if (relYearInput) relYearInput.value = '2026';
+    if (relYearInput) relYearInput.value = todayIso.split('-')[0] || '2026';
+    if (relDateInput) relDateInput.value = todayIso;
+    if (relDatePicker) relDatePicker.value = todayIso;
     if (relCoverInput) relCoverInput.value = 'assets/Anxious Story.jpg';
     if (relStatusSelect) relStatusSelect.value = 'OUT NOW';
     if (relTaglineInput) relTaglineInput.value = 'Solo piano touch meeting the energy of melodic progressive house.';
@@ -673,6 +696,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (relTitleInput) relTitleInput.value = rel.title || '';
     if (relTypeSelect) relTypeSelect.value = rel.type || 'EP';
     if (relYearInput) relYearInput.value = rel.year || '2026';
+    if (relDateInput) relDateInput.value = rel.releaseDate || '';
+    if (relDatePicker && /^\d{4}-\d{2}-\d{2}$/.test(rel.releaseDate || '')) {
+      relDatePicker.value = rel.releaseDate;
+    }
     if (relCoverInput) relCoverInput.value = rel.coverUrl || 'assets/Anxious Story.jpg';
     if (relStatusSelect) relStatusSelect.value = rel.status || 'OUT NOW';
     if (relTaglineInput) relTaglineInput.value = rel.tagline || '';
@@ -731,7 +758,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <img src="${escapeHtml(safeCover)}" alt="${escapeHtml(rel.title)}" class="release-row-thumb">
             <div class="release-row-info">
               <span class="release-row-title">${escapeHtml(rel.title)} ${rel.isLatest ? ' <span style="color: var(--accent-color);">[FEATURED HERO]</span>' : ''}</span>
-              <span class="release-row-meta">${escapeHtml(rel.type)} • ${escapeHtml(rel.year)} • ${escapeHtml(rel.status || 'OUT NOW')} • ${escapeHtml(rel.craftSpec ? rel.craftSpec.badge : 'Studio')}</span>
+              <span class="release-row-meta">${escapeHtml(rel.type)} • ${escapeHtml(rel.year)}${rel.releaseDate ? ' (' + escapeHtml(rel.releaseDate) + ')' : ''} • ${escapeHtml(rel.status || 'OUT NOW')} • ${escapeHtml(rel.craftSpec ? rel.craftSpec.badge : 'Studio')}</span>
             </div>
           </div>
           <div class="release-row-actions">
@@ -802,6 +829,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const editIdx = parseInt(editRelIndexInput?.value || '-1', 10);
       const type = relTypeSelect.value;
       const year = relYearInput.value.trim() || '2026';
+      const releaseDate = relDateInput ? relDateInput.value.trim() : new Date().toISOString().split('T')[0];
       const coverUrl = sanitizeUrl(relCoverInput.value.trim(), 'assets/Anxious Story.jpg');
       const status = relStatusSelect.value;
       const tagline = relTaglineInput.value.trim();
@@ -833,6 +861,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         existing.type = type;
         existing.category = type.toLowerCase() === 'single' ? 'single' : 'ep';
         existing.year = year;
+        existing.releaseDate = releaseDate;
         existing.coverUrl = coverUrl;
         existing.status = status;
         existing.tagline = tagline;
@@ -857,7 +886,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           type,
           category: type.toLowerCase() === 'single' ? 'single' : 'ep',
           year,
-          releaseDate: new Date().toISOString().split('T')[0],
+          releaseDate,
           coverUrl,
           accentColor: normalizeHexColor(colorInput?.value, '#FF5722'),
           tagline: tagline || `New ${type} by Bel Gray.`,
