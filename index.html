@@ -53,6 +53,8 @@
   </script>
 </head>
 <body>
+  <!-- Ambient Cursor Spotlight Effect -->
+  <div id="ambient-spotlight" class="ambient-spotlight" aria-hidden="true"></div>
 
   <!-- 1. Hot Announcement Top Bar (Controlled via Admin / Config) -->
   <div id="announcement-bar" class="announcement-bar" role="alert">
@@ -150,29 +152,36 @@
           </a>
         </div>
 
-        <div class="streaming-row">
-          <span class="streaming-label">AVAILABLE WORLDWIDE ON</span>
-          <div class="streaming-badges">
-            <a href="https://music.yandex.ru/artist/belgray" target="_blank" rel="noopener" class="platform-chip">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm3.8 14.5-3.3-2.6-1.5 2.1H8.5l2.6-3.7-2.4-3.8h2.6l1.7 2.7 1.8-2.7h2.6l-3.2 4.4 3.8 3.6z"/></svg>
-              <span>Яндекс Музыка</span>
-            </a>
-            <a href="https://vk.com/artist/belgray" target="_blank" rel="noopener" class="platform-chip">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M15.68 2H8.32C3.99 2 2 3.99 2 8.32v7.36C2 20.01 3.99 22 8.32 22h7.36c4.33 0 6.32-1.99 6.32-6.32V8.32C22 3.99 20.01 2 15.68 2zm3.32 14.65h-1.63c-.62 0-.81-.49-1.92-1.6-.97-.94-1.4-.1.06-1.4-.18 0-.4.07-.57.21l-.01.01c-.34.28-.43.59-.43 1.2v.38c0 .32-.1.5-.96.5-1.42 0-2.99-.86-4.1-2.47-1.67-2.36-2.14-4.14-2.14-4.5 0-.2.08-.38.47-.38h1.63c.4 0 .54.18.7.6.77 2.25 2.07 4.22 2.61 4.22.2 0 .29-.09.29-.6v-2.33c-.06-1.07-.63-1.16-.63-1.54 0-.19.16-.38.42-.38h2.57c.36 0 .48.19.48.61v3.34c0 .36.16.48.27.48.21 0 .39-.13.78-.52 1.2-1.34 2.05-3.41 2.05-3.41.11-.23.3-.43.72-.43h1.63c.49 0 .6.25.49.6-.2 1.02-2.37 3.98-2.48 4.16-.22.34-.31.49 0 .91.22.3 1 1 1.51 1.7.38.53.67.97.75 1.28.12.35-.07.54-.42.54z"/></svg>
-              <span>VK Музыка</span>
-            </a>
-            <a href="https://open.spotify.com/artist/belgray" target="_blank" rel="noopener" class="platform-chip">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.563.387-.857.207-2.348-1.435-5.304-1.76-8.785-.964-.335.077-.67-.133-.746-.468-.077-.335.132-.67.467-.746 3.808-.87 7.076-.496 9.714 1.115.295.18.387.563.207.856zm1.223-2.72c-.226.367-.707.482-1.074.256-2.687-1.652-6.785-2.131-9.965-1.166-.413.126-.85-.108-.975-.521-.125-.413.108-.85.52-.975 3.632-1.103 8.147-.568 11.238 1.332.367.226.482.707.256 1.074zm.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71c-.493.15-1.016-.129-1.166-.622-.149-.493.13-1.016.623-1.166 3.532-1.072 9.404-.866 13.115 1.338.445.264.59.838.327 1.282-.264.445-.838.59-1.282.327z"/></svg>
-              <span>Spotify</span>
-            </a>
-            <a href="https://music.apple.com/artist/belgray" target="_blank" rel="noopener" class="platform-chip">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.88 6.06c.07.69-.36 1.41-1.07 1.77-.52.26-1.1.25-1.68.22-.05-.01-.1-.02-.15-.02-.1 0-.17.06-.17.16v6.33c0 .32-.2.6-.5.72-.67.26-1.52.46-2.22.46-1.56 0-2.82-.92-2.82-2.37 0-1.46 1.26-2.45 2.82-2.45.65 0 1.35.19 1.78.43v-5.6c0-.52.37-.96.88-1.05.9-.16 2.08-.4 2.89-.52.12-.02.24.07.24.2z"/></svg>
-              <span>Apple Music</span>
-            </a>
-            <a href="https://youtube.com/@belgray_music" target="_blank" rel="noopener" class="platform-chip">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
-              <span>YouTube Music</span>
-            </a>
+        <!-- Animated Streaming Platforms Carousel (Tier 1: Global -> Tier 2: Russian -> Tier 3: Niche) -->
+        <div class="streaming-showcase" id="streaming-showcase">
+          <div class="streaming-showcase-header">
+            <div class="streaming-showcase-title-group">
+              <span class="streaming-label">AVAILABLE WORLDWIDE • OFFICIAL STREAMING HUB</span>
+              <div class="streaming-tier-tabs" id="streaming-tier-tabs" role="tablist" aria-label="Filter streaming platforms by region">
+                <button type="button" class="tier-tab-btn active" data-tier="all">All Platforms</button>
+                <button type="button" class="tier-tab-btn" data-tier="global">1. Global</button>
+                <button type="button" class="tier-tab-btn" data-tier="ru">2. Russia</button>
+                <button type="button" class="tier-tab-btn" data-tier="other">3. Other</button>
+              </div>
+            </div>
+            <div class="streaming-carousel-controls">
+              <button type="button" class="carousel-nav-btn" id="stream-prev-btn" aria-label="Previous platforms">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <button type="button" class="carousel-nav-btn" id="stream-next-btn" aria-label="Next platforms">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="streaming-carousel-viewport" id="streaming-carousel-viewport">
+            <div class="streaming-carousel-track" id="hero-streaming-carousel-track">
+              <!-- Populated dynamically via app.js in strict Global -> Russian -> Niche order -->
+            </div>
           </div>
         </div>
       </div>
@@ -299,51 +308,7 @@
       </p>
 
       <div class="modal-platform-list" id="modal-platform-links">
-        <a href="https://band.link/anxious_story" id="modal-link-bandlink" target="_blank" rel="noopener noreferrer" class="modal-platform-btn">
-          <div class="modal-platform-left">
-            <svg class="modal-platform-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zm4.1 1h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
-            </svg>
-            <span>BandLink (All Platforms Smartlink)</span>
-          </div>
-          <span class="modal-platform-arrow">OPEN ↗</span>
-        </a>
-        <a href="https://music.yandex.ru/artist/belgray" id="modal-link-yandex" target="_blank" rel="noopener noreferrer" class="modal-platform-btn">
-          <div class="modal-platform-left">
-            <svg class="modal-platform-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm3.8 14.5-3.3-2.6-1.5 2.1H8.5l2.6-3.7-2.4-3.8h2.6l1.7 2.7 1.8-2.7h2.6l-3.2 4.4 3.8 3.6z"/>
-            </svg>
-            <span>Яндекс Музыка</span>
-          </div>
-          <span class="modal-platform-arrow">PLAY ↗</span>
-        </a>
-        <a href="https://vk.com/artist/belgray" id="modal-link-vk" target="_blank" rel="noopener noreferrer" class="modal-platform-btn">
-          <div class="modal-platform-left">
-            <svg class="modal-platform-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M15.68 2H8.32C3.99 2 2 3.99 2 8.32v7.36C2 20.01 3.99 22 8.32 22h7.36c4.33 0 6.32-1.99 6.32-6.32V8.32C22 3.99 20.01 2 15.68 2zm3.32 14.65h-1.63c-.62 0-.81-.49-1.92-1.6-.97-.94-1.4-.1.06-1.4-.18 0-.4.07-.57.21l-.01.01c-.34.28-.43.59-.43 1.2v.38c0 .32-.1.5-.96.5-1.42 0-2.99-.86-4.1-2.47-1.67-2.36-2.14-4.14-2.14-4.5 0-.2.08-.38.47-.38h1.63c.4 0 .54.18.7.6.77 2.25 2.07 4.22 2.61 4.22.2 0 .29-.09.29-.6v-2.33c-.06-1.07-.63-1.16-.63-1.54 0-.19.16-.38.42-.38h2.57c.36 0 .48.19.48.61v3.34c0 .36.16.48.27.48.21 0 .39-.13.78-.52 1.2-1.34 2.05-3.41 2.05-3.41.11-.23.3-.43.72-.43h1.63c.49 0 .6.25.49.6-.2 1.02-2.37 3.98-2.48 4.16-.22.34-.31.49 0 .91.22.3 1 1 1.51 1.7.38.53.67.97.75 1.28.12.35-.07.54-.42.54z"/>
-            </svg>
-            <span>VK Музыка</span>
-          </div>
-          <span class="modal-platform-arrow">PLAY ↗</span>
-        </a>
-        <a href="https://open.spotify.com/artist/belgray" id="modal-link-spotify" target="_blank" rel="noopener noreferrer" class="modal-platform-btn">
-          <div class="modal-platform-left">
-            <svg class="modal-platform-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.563.387-.857.207-2.348-1.435-5.304-1.76-8.785-.964-.335.077-.67-.133-.746-.468-.077-.335.132-.67.467-.746 3.808-.87 7.076-.496 9.714 1.115.295.18.387.563.207.856zm1.223-2.72c-.226.367-.707.482-1.074.256-2.687-1.652-6.785-2.131-9.965-1.166-.413.126-.85-.108-.975-.521-.125-.413.108-.85.52-.975 3.632-1.103 8.147-.568 11.238 1.332.367.226.482.707.256 1.074zm.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71c-.493.15-1.016-.129-1.166-.622-.149-.493.13-1.016.623-1.166 3.532-1.072 9.404-.866 13.115 1.338.445.264.59.838.327 1.282-.264.445-.838.59-1.282.327z"/>
-            </svg>
-            <span>Spotify</span>
-          </div>
-          <span class="modal-platform-arrow">PLAY ↗</span>
-        </a>
-        <a href="https://music.apple.com/artist/belgray" id="modal-link-apple" target="_blank" rel="noopener noreferrer" class="modal-platform-btn">
-          <div class="modal-platform-left">
-            <svg class="modal-platform-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.88 6.06c.07.69-.36 1.41-1.07 1.77-.52.26-1.1.25-1.68.22-.05-.01-.1-.02-.15-.02-.1 0-.17.06-.17.16v6.33c0 .32-.2.6-.5.72-.67.26-1.52.46-2.22.46-1.56 0-2.82-.92-2.82-2.37 0-1.46 1.26-2.45 2.82-2.45.65 0 1.35.19 1.78.43v-5.6c0-.52.37-.96.88-1.05.9-.16 2.08-.4 2.89-.52.12-.02.24.07.24.2z"/>
-            </svg>
-            <span>Apple Music</span>
-          </div>
-          <span class="modal-platform-arrow">PLAY ↗</span>
-        </a>
+        <!-- Populated dynamically via app.js in strict Global -> Russian -> Niche order -->
       </div>
     </div>
   </div>

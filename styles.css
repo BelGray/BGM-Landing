@@ -8,6 +8,7 @@
   /* Dynamic Theme Accents (Adaptable per release) */
   --accent-color: #FF5722;
   --accent-hover: #F4511E;
+  --accent-contrast: #FFFFFF;
   --accent-glow: rgba(255, 87, 34, 0.22);
   --accent-subtle: rgba(255, 87, 34, 0.10);
   --accent-border: rgba(255, 87, 34, 0.40);
@@ -78,6 +79,21 @@ body {
   position: relative;
 }
 
+/* Ambient Cursor Spotlight */
+.ambient-spotlight {
+  position: fixed;
+  width: 650px;
+  height: 650px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 68%);
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.4s ease;
+  will-change: left, top;
+}
+
 body::before {
   content: '';
   position: fixed;
@@ -91,7 +107,7 @@ body::before {
 
 ::selection {
   background: var(--accent-color);
-  color: #FFFFFF;
+  color: var(--accent-contrast, #FFFFFF);
 }
 
 a {
@@ -149,7 +165,7 @@ button {
   letter-spacing: 0.14em;
   padding: 3px 8px;
   background: var(--accent-color);
-  color: #FFFFFF;
+  color: var(--accent-contrast, #FFFFFF);
   border-radius: var(--radius-xs);
   text-transform: uppercase;
   box-shadow: 0 0 14px var(--accent-glow);
@@ -344,14 +360,19 @@ button {
 
 .btn-primary {
   background-color: var(--accent-color);
-  color: #FFFFFF;
+  color: var(--accent-contrast, #FFFFFF);
   border: 1px solid var(--accent-color);
   box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+.btn-primary svg {
+  fill: currentColor;
 }
 
 .btn-primary:hover {
   background-color: var(--accent-hover);
   border-color: var(--accent-hover);
+  color: var(--accent-contrast, #FFFFFF);
   transform: translateY(-2px);
   box-shadow: 0 10px 28px var(--accent-glow);
 }
@@ -426,7 +447,7 @@ button {
 }
 
 .hero-container {
-  max-width: 860px;
+  max-width: 1120px;
 }
 
 .hero-status-pill {
@@ -511,54 +532,262 @@ button {
   100% { transform: scaleY(1); }
 }
 
-/* Streaming platforms list */
-.streaming-row {
+/* ==========================================================================
+   ANIMATED STREAMING PLATFORMS CAROUSEL (1. GLOBAL -> 2. RUSSIA -> 3. NICHE)
+   ========================================================================== */
+.streaming-showcase {
+  width: 100%;
+  margin-top: 12px;
+  padding: 24px 26px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(20, 20, 28, 0.72) 0%, rgba(12, 12, 17, 0.88) 100%);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.streaming-showcase::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 560px;
+  height: 160px;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 72%);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.streaming-showcase-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.streaming-showcase-title-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .streaming-label {
   font-family: var(--font-mono);
   font-size: 10px;
+  font-weight: 700;
   letter-spacing: 0.2em;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   text-transform: uppercase;
 }
 
-.streaming-badges {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.platform-chip {
+.streaming-tier-tabs {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
+  gap: 6px;
+  background: rgba(8, 8, 12, 0.75);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.tier-tab-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 5px 12px;
   border-radius: var(--radius-xs);
-  background: var(--bg-surface);
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.tier-tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.tier-tab-btn.active {
+  background: var(--accent-color);
+  color: var(--accent-contrast, #FFFFFF);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.streaming-carousel-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.carousel-nav-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   transition: var(--transition-fast);
 }
 
-.platform-chip:hover {
-  border-color: var(--border-medium);
+.carousel-nav-btn:hover {
   color: var(--text-primary);
-  background: var(--bg-card);
+  border-color: var(--accent-color);
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 14px var(--accent-glow);
   transform: translateY(-1px);
 }
 
-.platform-chip svg {
-  width: 14px;
-  height: 14px;
-  fill: currentColor;
+.carousel-nav-sm {
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.streaming-carousel-viewport {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 10px 4px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+}
+
+.streaming-carousel-track {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  width: max-content;
+  will-change: transform;
+}
+
+.streaming-carousel-track.is-filtered-static {
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.stream-carousel-card {
+  min-width: 232px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(26, 26, 35, 0.92), rgba(15, 15, 21, 0.96));
+  border: 1px solid var(--border-medium);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.3s ease, background 0.25s ease;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+
+.stream-carousel-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 90% 10%, var(--accent-glow) 0%, transparent 65%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.stream-carousel-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  border-color: var(--accent-color);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.72), 0 0 28px var(--accent-glow);
+}
+
+.stream-carousel-card:hover::before {
+  opacity: 0.9;
+}
+
+.stream-card-icon-wrap {
+  width: 54px;
+  height: 54px;
+  border-radius: 13px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0D0D12;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.stream-carousel-card:hover .stream-card-icon-wrap {
+  transform: scale(1.08) rotate(-2deg);
+  box-shadow: 0 8px 22px var(--accent-glow);
+}
+
+.stream-card-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.stream-card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.stream-card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.stream-tier-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  background: var(--accent-subtle);
+  color: var(--accent-color);
+  border: 1px solid var(--accent-border);
+}
+
+.stream-card-arrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.stream-carousel-card:hover .stream-card-arrow {
+  color: var(--accent-color);
+  transform: translate(2px, -2px);
+}
+
+.stream-card-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ==========================================================================
@@ -578,7 +807,8 @@ button {
   border-radius: var(--radius-lg);
   padding: 44px;
   display: grid;
-  grid-template-columns: 380px 1fr;
+  grid-template-columns: 380px minmax(0, 1fr);
+  align-items: center;
   gap: 48px;
   position: relative;
   overflow: hidden;
@@ -591,8 +821,8 @@ button {
   position: absolute;
   top: 0;
   right: 0;
-  width: 400px;
-  height: 400px;
+  width: 420px;
+  height: 420px;
   background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
   opacity: 0.5;
   pointer-events: none;
@@ -602,60 +832,159 @@ button {
   border-color: var(--accent-border);
 }
 
-/* Cover Art Sleeve */
+/* ==========================================================================
+   ROUND VINYL RECORD WITH ALBUM ART -> 3D CLOSE-UP COVER POP-OUT ON HOVER
+   ========================================================================== */
 .featured-cover-box {
   position: relative;
-  perspective: 1200px;
-}
-
-.cover-image-frame {
-  position: relative;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 1px solid var(--border-medium);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  width: 100%;
+  max-width: 380px;
   aspect-ratio: 1 / 1;
-  background-color: var(--bg-card);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color var(--transition-fast);
-  transform-style: preserve-3d;
+  align-self: center;
+  margin: 0 auto;
+  perspective: 1100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
 }
 
-.cover-image-frame::after {
-  content: '';
+/* Ambient Halo Behind the Vinyl / 3D Cover */
+.cover-ambient-halo {
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  opacity: 0.45;
+  filter: blur(22px);
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.45s ease, border-radius 0.45s ease;
+  z-index: 0;
+}
+
+.featured-cover-box:hover .cover-ambient-halo {
+  opacity: 1;
+  border-radius: var(--radius-md);
+  transform: scale(1.12);
+}
+
+/* DEFAULT STATE: 100% Round Vinyl Record with Album Cover Artwork */
+.vinyl-disc-stage {
+  position: relative;
+  width: 96%;
+  height: 96%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), filter 0.45s ease, opacity 0.45s ease;
+}
+
+.vinyl-platter {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #060609 0%, #111116 62%, #07070A 100%);
+  box-shadow:
+    0 22px 50px rgba(0, 0, 0, 0.9),
+    0 0 28px var(--accent-glow),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: vinyl-spin-slow 24s linear infinite;
+}
+
+@keyframes vinyl-spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.vinyl-grooves-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.35s ease;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.04) 0px,
+      rgba(255, 255, 255, 0.04) 1px,
+      transparent 2px,
+      transparent 5px
+    ),
+    conic-gradient(
+      from 25deg,
+      rgba(255, 255, 255, 0.14) 0deg,
+      transparent 48deg,
+      rgba(255, 255, 255, 0.11) 115deg,
+      transparent 175deg,
+      rgba(255, 255, 255, 0.14) 225deg,
+      transparent 285deg,
+      rgba(255, 255, 255, 0.11) 335deg,
+      transparent 360deg
+    );
   pointer-events: none;
+  z-index: 1;
 }
 
-.featured-card:hover .cover-image-frame {
-  transform: perspective(800px) rotateX(4deg) rotateY(-5deg) translateY(-4px);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 35px var(--accent-glow);
-  border-color: var(--accent-border);
+/* Circular Album Cover Artwork on the Vinyl Record */
+.vinyl-art-circle {
+  position: relative;
+  width: 66%;
+  height: 66%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 2;
+  border: 3px solid #09090D;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 0 26px rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.featured-card:hover .cover-image-frame::after {
-  opacity: 1;
-}
-
-.cover-image-frame img {
+.vinyl-art-circle img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-smooth);
+  border-radius: 50%;
+  display: block;
 }
 
-.featured-card:hover .cover-image-frame img {
-  transform: scale(1.03);
-}
-
-.cover-badge-top {
+.vinyl-center-ring {
   position: absolute;
-  top: 14px;
-  left: 14px;
-  background: rgba(0, 0, 0, 0.75);
+  width: 22%;
+  height: 22%;
+  border-radius: 50%;
+  background: rgba(8, 8, 12, 0.78);
+  border: 2px solid var(--accent-color);
+  box-shadow: 0 0 14px var(--accent-glow), inset 0 0 8px rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vinyl-spindle {
+  width: 38%;
+  height: 38%;
+  border-radius: 50%;
+  background: #050507;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.vinyl-badge-top {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  background: rgba(8, 8, 12, 0.85);
   backdrop-filter: blur(8px);
   padding: 4px 10px;
   border-radius: var(--radius-xs);
@@ -664,7 +993,90 @@ button {
   font-weight: 700;
   letter-spacing: 0.12em;
   color: var(--accent-color);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--accent-border);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease;
+}
+
+/* HOVER STATE: Full Square Album Cover Pops Out to Close-Up in 3D with Glow */
+.cover-3d-popup {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  z-index: 4;
+  background: var(--bg-card);
+  border: 1px solid var(--accent-color);
+  opacity: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  transform: perspective(1000px) translateZ(-70px) scale(0.68) rotateX(14deg) rotateY(-12deg);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  transition:
+    opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cover-3d-popup img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-3d-glare {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--glare-x, 30%) var(--glare-y, 20%),
+    rgba(255, 255, 255, 0.30) 0%,
+    rgba(255, 255, 255, 0.08) 32%,
+    transparent 65%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.featured-cover-box:hover .vinyl-disc-stage {
+  transform: scale(0.86);
+  filter: brightness(0.32) blur(2px);
+  opacity: 0.55;
+}
+
+.featured-cover-box:hover .vinyl-badge-top {
+  opacity: 0;
+}
+
+.featured-cover-box:hover .cover-3d-popup {
+  opacity: 1;
+  pointer-events: auto;
+  transform: perspective(1000px) translateZ(34px) scale(1.04) rotateX(var(--cover-rx, 5deg)) rotateY(var(--cover-ry, -6deg));
+  box-shadow:
+    0 30px 68px rgba(0, 0, 0, 0.92),
+    0 0 54px var(--accent-glow),
+    0 0 22px var(--accent-color),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+.cover-badge-top {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-border);
+  box-shadow: 0 0 14px var(--accent-glow);
 }
 
 /* Details */
@@ -672,6 +1084,8 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-width: 0;
+  width: 100%;
 }
 
 .featured-header {
@@ -762,7 +1176,7 @@ button {
 
 .track-item {
   display: grid;
-  grid-template-columns: 32px 1fr auto auto;
+  grid-template-columns: 32px 1fr auto;
   align-items: center;
   padding: 10px 12px;
   border-radius: var(--radius-xs);
@@ -798,6 +1212,30 @@ button {
 .track-play-icon {
   width: 16px;
   height: 16px;
+}
+
+/* Audio Playing Equalizer Mini Animation */
+.track-equalizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.eq-bar {
+  width: 2.5px;
+  background-color: var(--accent-color);
+  border-radius: 1px;
+  animation: eq-bounce 0.8s ease-in-out infinite alternate;
+}
+
+.eq-bar-1 { height: 35%; animation-delay: 0.1s; }
+.eq-bar-2 { height: 95%; animation-delay: 0.35s; }
+.eq-bar-3 { height: 60%; animation-delay: 0.2s; }
+
+@keyframes eq-bounce {
+  0% { height: 25%; }
+  100% { height: 100%; }
 }
 
 .track-num-text {
@@ -907,12 +1345,126 @@ button {
   color: var(--text-secondary);
 }
 
-/* Action Hub */
-.featured-actions-hub {
+/* Featured Release Streaming Hub & Carousel Strip */
+.featured-streaming-hub {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  width: 100%;
+}
+
+.featured-streaming-top {
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: space-between;
+  gap: 12px;
   flex-wrap: wrap;
+}
+
+.featured-strip-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.featured-strip-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+.featured-streaming-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 6px 2px 10px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-medium) transparent;
+}
+
+.featured-streaming-strip::-webkit-scrollbar {
+  height: 4px;
+}
+
+.featured-streaming-strip::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: 4px;
+}
+
+.featured-stream-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  min-width: 170px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(24, 24, 32, 0.95), rgba(14, 14, 20, 0.98));
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.featured-stream-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-color);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.65), 0 0 20px var(--accent-glow);
+}
+
+.featured-stream-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.featured-stream-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.featured-stream-tier {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  align-self: flex-start;
+}
+
+.featured-stream-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.featured-stream-arrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.featured-stream-card:hover .featured-stream-arrow {
+  color: var(--accent-color);
+  transform: translate(2px, -2px);
 }
 
 /* ==========================================================================
@@ -1408,13 +1960,27 @@ button {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-medium) transparent;
+}
+
+.modal-platform-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.modal-platform-list::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: 4px;
 }
 
 .modal-platform-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 18px;
+  padding: 11px 16px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
@@ -1422,6 +1988,27 @@ button {
   font-size: 13px;
   font-weight: 600;
   transition: var(--transition-fast);
+}
+
+.modal-smartlink-featured {
+  border-color: var(--accent-border);
+  background: var(--accent-subtle);
+}
+
+.modal-smartlink-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--accent-color);
+  color: var(--accent-contrast, #FFFFFF);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px var(--accent-glow);
 }
 
 .modal-platform-btn:hover {
@@ -1437,10 +2024,32 @@ button {
   gap: 12px;
 }
 
-.modal-platform-icon {
-  width: 18px;
-  height: 18px;
-  color: var(--accent-color);
+.modal-platform-svg-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+.modal-platform-text-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 1px;
+}
+
+.modal-platform-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.modal-platform-tier-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
 }
 
 .modal-platform-arrow {
@@ -1473,6 +2082,20 @@ button {
 @media (max-width: 768px) {
   .desktop-nav {
     display: none;
+  }
+  .desktop-nav.mobile-open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 74px;
+    left: 0;
+    right: 0;
+    background: var(--bg-glass);
+    padding: 24px;
+    border-bottom: 1px solid var(--border-medium);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 200;
   }
   .mobile-nav-toggle {
     display: flex;

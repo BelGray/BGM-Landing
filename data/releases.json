@@ -1,0 +1,64 @@
+[
+  {
+    "id": "anxious-story",
+    "title": "Anxious Story",
+    "type": "EP",
+    "category": "ep",
+    "year": "2026",
+    "releaseDate": "2026-10-21",
+    "coverUrl": "assets/Anxious Story.jpg",
+    "accentColor": "#FF5722",
+    "tagline": "A four-act journey through the human crisis cycle — from solitary acoustic piano reflections into melodic progressive house.",
+    "isLatest": true,
+    "status": "OUT NOW",
+    "smartlink": "https://band.link/anxious_story",
+    "craftSpec": {
+      "badge": "Hybrid Concept",
+      "type": "hybrid",
+      "summary": "Piano Harmony by Daniel Belyaev • Neural Vocal Synthesis • FL Studio DAW Engineering"
+    },
+    "tracklist": [
+      {
+        "number": "01",
+        "title": "The Quiet",
+        "duration": "02:44",
+        "genre": "Acoustic / Indie Pop",
+        "previewUrl": ""
+      },
+      {
+        "number": "02",
+        "title": "The Gale",
+        "duration": "03:07",
+        "genre": "Alternative Rock",
+        "previewUrl": ""
+      },
+      {
+        "number": "03",
+        "title": "The Midnight Whisper",
+        "duration": "02:52",
+        "genre": "Cinematic Neoclassical",
+        "previewUrl": ""
+      },
+      {
+        "number": "04",
+        "title": "To Be the Light",
+        "duration": "02:02",
+        "genre": "Melodic Progressive House",
+        "previewUrl": ""
+      }
+    ],
+    "links": {
+      "spotify": "https://open.spotify.com/artist/belgray",
+      "apple": "https://music.apple.com/artist/belgray",
+      "youtube": "https://youtube.com/@belgray_music",
+      "amazon": "https://band.link/anxious_story",
+      "deezer": "https://band.link/anxious_story",
+      "soundcloud": "https://band.link/anxious_story",
+      "yandex": "https://music.yandex.ru/artist/belgray",
+      "vk": "https://vk.com/artist/belgray",
+      "zvuk": "https://band.link/anxious_story",
+      "tidal": "https://band.link/anxious_story",
+      "tme": "https://band.link/anxious_story"
+    }
+  }
+]
