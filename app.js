@@ -249,6 +249,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       tiktok: "https://tiktok.com/@belgray_music",
       smartlink: "https://band.link/anxious_story",
       email: "contact@belgray.com"
+    },
+    footer: {
+      brandTitle: "BEL GRAY",
+      brandDesc: "Acoustic piano keys, progressive house frequencies, and authentic human emotion.",
+      copyrightYear: "2026",
+      copyrightOwner: "Bel Gray (Daniel Belyaev). All rights reserved.",
+      bottomTagline: "Crafted with pure code & sound architecture",
+      email: "contact@belgray.com",
+      emailLabel: "Inquiries & Booking",
+      smartlinkLabel: "BandLink Smartlink",
+      smartlinkUrl: "https://band.link/anxious_story",
+      links: [
+        { title: "Telegram Channel", url: "https://t.me/belgray_music" },
+        { title: "YouTube", url: "https://youtube.com/@belgray_music" },
+        { title: "VK Community", url: "https://vk.com/belgray_music" },
+        { title: "TikTok", url: "https://tiktok.com/@belgray_music" }
+      ]
     }
   };
 
@@ -287,7 +304,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           announcement: mergeNonEmpty(defaultConfig.announcement, parsedConfig.announcement),
           bio: mergeNonEmpty(defaultConfig.bio, parsedConfig.bio),
           documentary: mergeNonEmpty(defaultConfig.documentary, parsedConfig.documentary),
-          socials: mergeNonEmpty(defaultConfig.socials, parsedConfig.socials)
+          socials: mergeNonEmpty(defaultConfig.socials, parsedConfig.socials),
+          footer: parsedConfig.footer ? {
+            ...defaultConfig.footer,
+            ...parsedConfig.footer,
+            links: Array.isArray(parsedConfig.footer.links) ? parsedConfig.footer.links : defaultConfig.footer.links
+          } : defaultConfig.footer
         };
       } else {
         const resConfig = await fetch('data/site-config.json');
@@ -1336,6 +1358,68 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
         }
       }
+    }
+
+    // Dynamic Footer (Brand, Ecosystem Social Links, Direct Links & Email, Copyright & Year)
+    const footerBrandTitle = document.getElementById('footer-brand-title');
+    const footerBrandDesc = document.getElementById('footer-brand-desc');
+    const footerEcosystemLinks = document.getElementById('footer-ecosystem-links');
+    const footerSmartlink = document.getElementById('footer-smartlink');
+    const footerEmailLink = document.getElementById('footer-email-link');
+    const footerCopyrightText = document.getElementById('footer-copyright-text');
+    const footerTaglineText = document.getElementById('footer-tagline-text');
+
+    const foot = cfg.footer || defaultConfig.footer;
+    if (footerBrandTitle) {
+      footerBrandTitle.textContent = (foot.brandTitle || 'BEL GRAY').trim();
+    }
+    if (footerBrandDesc) {
+      footerBrandDesc.textContent = (foot.brandDesc || '').trim();
+    }
+
+    if (footerEcosystemLinks) {
+      const linksArray = (Array.isArray(foot.links) && foot.links.length > 0)
+        ? foot.links
+        : [
+            { title: 'Telegram Channel', url: cfg.socials?.telegram || 'https://t.me/belgray_music' },
+            { title: 'YouTube', url: cfg.socials?.youtube || 'https://youtube.com/@belgray_music' },
+            { title: 'VK Community', url: cfg.socials?.vk || 'https://vk.com/belgray_music' },
+            { title: 'TikTok', url: cfg.socials?.tiktok || 'https://tiktok.com/@belgray_music' }
+          ];
+
+      footerEcosystemLinks.innerHTML = linksArray.map(l => {
+        const safeUrl = sanitizeUrl(l.url || '#', '#');
+        const safeTitle = escapeHtml(l.title || 'Link');
+        return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeTitle}</a>`;
+      }).join('');
+    }
+
+    if (footerSmartlink) {
+      const smartUrl = foot.smartlinkUrl || cfg.socials?.smartlink || 'https://band.link/anxious_story';
+      footerSmartlink.href = sanitizeUrl(smartUrl, 'https://band.link/anxious_story');
+      footerSmartlink.textContent = foot.smartlinkLabel || 'BandLink Smartlink';
+    }
+
+    if (footerEmailLink) {
+      const emailVal = (foot.email || cfg.socials?.email || 'contact@belgray.com').trim();
+      const emailLbl = (foot.emailLabel || 'Inquiries & Booking').trim();
+      if (emailVal) {
+        footerEmailLink.style.display = '';
+        footerEmailLink.href = `mailto:${encodeURIComponent(emailVal)}`;
+        footerEmailLink.textContent = emailLbl || emailVal;
+      } else {
+        footerEmailLink.style.display = 'none';
+      }
+    }
+
+    if (footerCopyrightText) {
+      const year = (foot.copyrightYear || '2026').trim();
+      const owner = (foot.copyrightOwner || 'Bel Gray (Daniel Belyaev). All rights reserved.').trim();
+      footerCopyrightText.textContent = `© ${year} ${owner}`;
+    }
+
+    if (footerTaglineText && foot.bottomTagline) {
+      footerTaglineText.textContent = foot.bottomTagline.trim();
     }
   };
 

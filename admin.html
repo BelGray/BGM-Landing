@@ -104,6 +104,13 @@
           </svg>
           <span>Theme & Colors</span>
         </button>
+        <button class="admin-nav-item" data-tab="tab-footer">
+          <svg class="admin-nav-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+          <span>Footer & Socials</span>
+        </button>
         <button class="admin-nav-item" data-tab="tab-sync">
           <svg class="admin-nav-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
@@ -481,6 +488,85 @@
               <button class="btn btn-outline">Outline Focus</button>
               <div class="demo-tag">ERA // SPEC READY</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Footer, Socials & Copyright -->
+      <section id="tab-footer" class="admin-tab-pane">
+        <!-- Card 1: Dynamic Social Networks & Ecosystem Links -->
+        <div class="admin-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h3 class="card-title" style="margin-bottom: 4px;">Ecosystem & Social Networks</h3>
+              <p class="card-desc" style="margin-bottom: 0;">Add, edit, or remove any social networks and communities (Telegram, YouTube, VK, TikTok, Boosty, Twitch, SoundCloud, etc.) with 0 code changes.</p>
+            </div>
+            <button type="button" id="btn-add-footer-link" class="btn btn-sm btn-outline">+ Add Social Link</button>
+          </div>
+
+          <div id="footer-links-rows" class="footer-links-rows-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 18px;">
+            <!-- Populated dynamically via admin.js -->
+          </div>
+        </div>
+
+        <!-- Card 2: Contact Email & Direct Smartlinks -->
+        <div class="admin-card">
+          <h3 class="card-title">Direct Booking & Smartlinks</h3>
+          <p class="card-desc">Configure your booking/inquiries email address and primary smartlink.</p>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-footer-email">Contact / Booking Email Address</label>
+              <input type="email" id="cfg-footer-email" class="admin-input" value="contact@belgray.com" placeholder="e.g. contact@belgray.com">
+            </div>
+            <div class="form-group">
+              <label for="cfg-footer-email-label">Email Link Display Label</label>
+              <input type="text" id="cfg-footer-email-label" class="admin-input" value="Inquiries & Booking" placeholder="e.g. Inquiries & Booking">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-footer-smartlink-url">Smartlink Destination URL</label>
+              <input type="text" id="cfg-footer-smartlink-url" class="admin-input" value="https://band.link/anxious_story" placeholder="https://band.link/...">
+            </div>
+            <div class="form-group">
+              <label for="cfg-footer-smartlink-label">Smartlink Link Display Label</label>
+              <input type="text" id="cfg-footer-smartlink-label" class="admin-input" value="BandLink Smartlink" placeholder="e.g. BandLink Smartlink">
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Copyright & Branding -->
+        <div class="admin-card">
+          <h3 class="card-title">Copyright & Brand Architecture</h3>
+          <p class="card-desc">Set the copyright year, legal rights text, and footer branding.</p>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-footer-year">Copyright Year</label>
+              <input type="text" id="cfg-footer-year" class="admin-input" value="2026" placeholder="2026" maxlength="4">
+            </div>
+            <div class="form-group">
+              <label for="cfg-footer-owner">Copyright Notice / Rights Holder</label>
+              <input type="text" id="cfg-footer-owner" class="admin-input" value="Bel Gray (Daniel Belyaev). All rights reserved." placeholder="Bel Gray (Daniel Belyaev). All rights reserved.">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-footer-brand-title">Footer Brand Name</label>
+              <input type="text" id="cfg-footer-brand-title" class="admin-input" value="BEL GRAY" placeholder="BEL GRAY">
+            </div>
+            <div class="form-group">
+              <label for="cfg-footer-bottom-tagline">Bottom Technical Tagline</label>
+              <input type="text" id="cfg-footer-bottom-tagline" class="admin-input" value="Crafted with pure code & sound architecture" placeholder="Tagline">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-footer-brand-desc">Footer Brand Subtitle</label>
+            <textarea id="cfg-footer-brand-desc" class="admin-textarea" rows="2" placeholder="Acoustic piano keys, progressive house frequencies, and authentic human emotion.">Acoustic piano keys, progressive house frequencies, and authentic human emotion.</textarea>
           </div>
         </div>
       </section>

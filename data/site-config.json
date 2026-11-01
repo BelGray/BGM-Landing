@@ -63,5 +63,34 @@
     "tiktok": "https://tiktok.com/@belgray_music",
     "smartlink": "https://band.link/anxious_story",
     "email": "contact@belgray.com"
+  },
+  "footer": {
+    "brandTitle": "BEL GRAY",
+    "brandDesc": "Acoustic piano keys, progressive house frequencies, and authentic human emotion.",
+    "copyrightYear": "2026",
+    "copyrightOwner": "Bel Gray (Daniel Belyaev). All rights reserved.",
+    "bottomTagline": "Crafted with pure code & sound architecture",
+    "email": "contact@belgray.com",
+    "emailLabel": "Inquiries & Booking",
+    "smartlinkLabel": "BandLink Smartlink",
+    "smartlinkUrl": "https://band.link/anxious_story",
+    "links": [
+      {
+        "title": "Telegram Channel",
+        "url": "https://t.me/belgray_music"
+      },
+      {
+        "title": "YouTube",
+        "url": "https://youtube.com/@belgray_music"
+      },
+      {
+        "title": "VK Community",
+        "url": "https://vk.com/belgray_music"
+      },
+      {
+        "title": "TikTok",
+        "url": "https://tiktok.com/@belgray_music"
+      }
+    ]
   }
 }

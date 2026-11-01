@@ -255,6 +255,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       tiktok: "https://tiktok.com/@belgray_music",
       smartlink: "https://band.link/anxious_story",
       email: "contact@belgray.com"
+    },
+    footer: {
+      brandTitle: "BEL GRAY",
+      brandDesc: "Acoustic piano keys, progressive house frequencies, and authentic human emotion.",
+      copyrightYear: "2026",
+      copyrightOwner: "Bel Gray (Daniel Belyaev). All rights reserved.",
+      bottomTagline: "Crafted with pure code & sound architecture",
+      email: "contact@belgray.com",
+      emailLabel: "Inquiries & Booking",
+      smartlinkLabel: "BandLink Smartlink",
+      smartlinkUrl: "https://band.link/anxious_story",
+      links: [
+        { title: "Telegram Channel", url: "https://t.me/belgray_music" },
+        { title: "YouTube", url: "https://youtube.com/@belgray_music" },
+        { title: "VK Community", url: "https://vk.com/belgray_music" },
+        { title: "TikTok", url: "https://tiktok.com/@belgray_music" }
+      ]
     }
   };
 
@@ -328,7 +345,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         announcement: mergeNonEmpty(defaultSiteConfig.announcement, parsed.announcement),
         bio: mergeNonEmpty(defaultSiteConfig.bio, parsed.bio),
         documentary: mergeNonEmpty(defaultSiteConfig.documentary, parsed.documentary),
-        socials: mergeNonEmpty(defaultSiteConfig.socials, parsed.socials)
+        socials: mergeNonEmpty(defaultSiteConfig.socials, parsed.socials),
+        footer: parsed.footer ? {
+          ...defaultSiteConfig.footer,
+          ...parsed.footer,
+          links: Array.isArray(parsed.footer.links) ? parsed.footer.links : defaultSiteConfig.footer.links
+        } : defaultSiteConfig.footer
       };
     } else {
       const res = await fetch('data/site-config.json');
@@ -368,6 +390,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     'tab-bio': 'The Producer — Bio & Portrait',
     'tab-media': 'Documentary & Media Hub',
     'tab-theme': 'Era Theme & Visual Styling',
+    'tab-footer': 'Footer, Socials & Copyright',
     'tab-sync': 'Cloud & Security Settings'
   };
 
@@ -487,6 +510,91 @@ document.addEventListener('DOMContentLoaded', async () => {
         syncStatusText.textContent = 'CLOUD + LOCAL SYNC READY';
       }
     } catch (_) {}
+  };
+
+  // 4F. Form Binding: Footer, Socials & Copyright
+  const footerEmailInput = document.getElementById('cfg-footer-email');
+  const footerEmailLabelInput = document.getElementById('cfg-footer-email-label');
+  const footerSmartlinkUrlInput = document.getElementById('cfg-footer-smartlink-url');
+  const footerSmartlinkLabelInput = document.getElementById('cfg-footer-smartlink-label');
+  const footerYearInput = document.getElementById('cfg-footer-year');
+  const footerOwnerInput = document.getElementById('cfg-footer-owner');
+  const footerBrandTitleInput = document.getElementById('cfg-footer-brand-title');
+  const footerBrandDescInput = document.getElementById('cfg-footer-brand-desc');
+  const footerBottomTaglineInput = document.getElementById('cfg-footer-bottom-tagline');
+  const footerLinksRowsMount = document.getElementById('footer-links-rows');
+  const btnAddFooterLink = document.getElementById('btn-add-footer-link');
+
+  let editingFooterLinks = [];
+
+  const renderFooterLinksRows = () => {
+    if (!footerLinksRowsMount) return;
+    if (editingFooterLinks.length === 0) {
+      footerLinksRowsMount.innerHTML = `
+        <div style="padding: 14px; background: #0B0B10; border: 1px dashed var(--border-medium); border-radius: var(--radius-sm); text-align: center; color: var(--text-muted); font-size: 13px;">
+          No social links configured yet. Click <strong>+ Add Social Link</strong> to add one.
+        </div>
+      `;
+      return;
+    }
+
+    footerLinksRowsMount.innerHTML = editingFooterLinks.map((link, idx) => `
+      <div class="footer-link-edit-row" data-idx="${idx}" style="display: grid; grid-template-columns: 200px 1fr 38px; gap: 8px; align-items: center; background: #0C0C12; border: 1px solid var(--border-subtle); padding: 8px 12px; border-radius: var(--radius-sm);">
+        <input type="text" class="admin-input flink-title" data-idx="${idx}" value="${escapeHtml(link.title || '')}" placeholder="e.g. Telegram Channel, YouTube, VK">
+        <input type="text" class="admin-input flink-url" data-idx="${idx}" value="${escapeHtml(link.url || '')}" placeholder="https://...">
+        <button type="button" class="btn btn-sm btn-ghost btn-remove-flink" data-idx="${idx}" title="Delete Link" style="color: #FF453A; padding: 6px; display: flex; align-items: center; justify-content: center;">✕</button>
+      </div>
+    `).join('');
+
+    footerLinksRowsMount.querySelectorAll('.btn-remove-flink').forEach(btn => {
+      btn.addEventListener('click', () => {
+        syncFooterLinksFromDOM();
+        const i = parseInt(btn.dataset.idx, 10);
+        editingFooterLinks.splice(i, 1);
+        renderFooterLinksRows();
+      });
+    });
+  };
+
+  const syncFooterLinksFromDOM = () => {
+    if (!footerLinksRowsMount) return;
+    const rows = footerLinksRowsMount.querySelectorAll('.footer-link-edit-row');
+    if (rows.length === 0 && editingFooterLinks.length === 0) return;
+    editingFooterLinks = Array.from(rows).map(row => ({
+      title: row.querySelector('.flink-title')?.value.trim() || 'Link',
+      url: sanitizeUrl(row.querySelector('.flink-url')?.value.trim() || '#', '#')
+    }));
+  };
+
+  if (btnAddFooterLink) {
+    btnAddFooterLink.addEventListener('click', () => {
+      syncFooterLinksFromDOM();
+      editingFooterLinks.push({
+        title: 'New Social',
+        url: 'https://'
+      });
+      renderFooterLinksRows();
+    });
+  }
+
+  const populateFooterForm = () => {
+    const f = siteConfig.footer || defaultSiteConfig.footer;
+    if (footerEmailInput) footerEmailInput.value = f.email !== undefined ? f.email : defaultSiteConfig.footer.email;
+    if (footerEmailLabelInput) footerEmailLabelInput.value = f.emailLabel || defaultSiteConfig.footer.emailLabel;
+    if (footerSmartlinkUrlInput) footerSmartlinkUrlInput.value = f.smartlinkUrl || defaultSiteConfig.footer.smartlinkUrl;
+    if (footerSmartlinkLabelInput) footerSmartlinkLabelInput.value = f.smartlinkLabel || defaultSiteConfig.footer.smartlinkLabel;
+    if (footerYearInput) footerYearInput.value = f.copyrightYear || defaultSiteConfig.footer.copyrightYear;
+    if (footerOwnerInput) footerOwnerInput.value = f.copyrightOwner || defaultSiteConfig.footer.copyrightOwner;
+    if (footerBrandTitleInput) footerBrandTitleInput.value = f.brandTitle || defaultSiteConfig.footer.brandTitle;
+    if (footerBrandDescInput) footerBrandDescInput.value = f.brandDesc || defaultSiteConfig.footer.brandDesc;
+    if (footerBottomTaglineInput) footerBottomTaglineInput.value = f.bottomTagline || defaultSiteConfig.footer.bottomTagline;
+
+    if (Array.isArray(f.links) && f.links.length > 0) {
+      editingFooterLinks = JSON.parse(JSON.stringify(f.links));
+    } else {
+      editingFooterLinks = JSON.parse(JSON.stringify(defaultSiteConfig.footer.links));
+    }
+    renderFooterLinksRows();
   };
 
   // 5. Theme Studio Binding with Dynamic Contrast Calculation
@@ -1052,6 +1160,33 @@ CREATE POLICY "Admin Write Config" ON site_config FOR ALL TO authenticated USING
         link: sanitizeUrl(docLink.value.trim(), defaultSiteConfig.documentary.link)
       };
 
+      // Gather siteConfig: Footer, Socials & Copyright
+      syncFooterLinksFromDOM();
+      siteConfig.footer = {
+        brandTitle: footerBrandTitleInput ? (footerBrandTitleInput.value.trim() || defaultSiteConfig.footer.brandTitle) : defaultSiteConfig.footer.brandTitle,
+        brandDesc: footerBrandDescInput ? (footerBrandDescInput.value.trim() || defaultSiteConfig.footer.brandDesc) : defaultSiteConfig.footer.brandDesc,
+        copyrightYear: footerYearInput ? (footerYearInput.value.trim() || defaultSiteConfig.footer.copyrightYear) : defaultSiteConfig.footer.copyrightYear,
+        copyrightOwner: footerOwnerInput ? (footerOwnerInput.value.trim() || defaultSiteConfig.footer.copyrightOwner) : defaultSiteConfig.footer.copyrightOwner,
+        bottomTagline: footerBottomTaglineInput ? (footerBottomTaglineInput.value.trim() || defaultSiteConfig.footer.bottomTagline) : defaultSiteConfig.footer.bottomTagline,
+        email: footerEmailInput ? footerEmailInput.value.trim() : defaultSiteConfig.footer.email,
+        emailLabel: footerEmailLabelInput ? (footerEmailLabelInput.value.trim() || defaultSiteConfig.footer.emailLabel) : defaultSiteConfig.footer.emailLabel,
+        smartlinkLabel: footerSmartlinkLabelInput ? (footerSmartlinkLabelInput.value.trim() || defaultSiteConfig.footer.smartlinkLabel) : defaultSiteConfig.footer.smartlinkLabel,
+        smartlinkUrl: footerSmartlinkUrlInput ? sanitizeUrl(footerSmartlinkUrlInput.value.trim(), defaultSiteConfig.footer.smartlinkUrl) : defaultSiteConfig.footer.smartlinkUrl,
+        links: editingFooterLinks.length > 0 ? editingFooterLinks : defaultSiteConfig.footer.links
+      };
+
+      // Keep siteConfig.socials synced for backwards compatibility
+      siteConfig.socials = siteConfig.socials || {};
+      if (siteConfig.footer.email) siteConfig.socials.email = siteConfig.footer.email;
+      if (siteConfig.footer.smartlinkUrl) siteConfig.socials.smartlink = siteConfig.footer.smartlinkUrl;
+      editingFooterLinks.forEach(l => {
+        const t = (l.title || '').toLowerCase();
+        if (t.includes('telegram') || t.includes('телеграм')) siteConfig.socials.telegram = l.url;
+        else if (t.includes('youtube') || t.includes('ютуб')) siteConfig.socials.youtube = l.url;
+        else if (t.includes('vk') || t.includes('вк')) siteConfig.socials.vk = l.url;
+        else if (t.includes('tiktok') || t.includes('тикток')) siteConfig.socials.tiktok = l.url;
+      });
+
       // Gather & Sync Active Era Theme Color
       const validEraHex = normalizeHexColor(colorInput.value, '#FF5722');
       applyColorAdmin(validEraHex);
@@ -1098,6 +1233,7 @@ CREATE POLICY "Admin Write Config" ON site_config FOR ALL TO authenticated USING
   populateHeroForm();
   populateBioForm();
   populateDocForm();
+  populateFooterForm();
   populateSupabaseForm();
   renderReleasesAdmin();
 });
