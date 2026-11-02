@@ -111,6 +111,16 @@
           </svg>
           <span>Footer & Socials</span>
         </button>
+        <button class="admin-nav-item" data-tab="tab-seo">
+          <svg class="admin-nav-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          <span>SEO & Social Banner</span>
+        </button>
         <button class="admin-nav-item" data-tab="tab-sync">
           <svg class="admin-nav-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
@@ -198,17 +208,21 @@
       <!-- Tab: Hero Section -->
       <section id="tab-hero" class="admin-tab-pane">
         <div class="admin-card">
-          <h3 class="card-title">Hero Section & Taglines</h3>
-          <p class="card-desc">Configure the opening statement, status pills, and primary call-to-action buttons.</p>
+          <h3 class="card-title">Hero Section &amp; Header Branding</h3>
+          <p class="card-desc">Configure the top header identity, opening statement, status pills, and call-to-action buttons.</p>
 
-          <div class="form-grid-2">
+          <div class="form-grid-3">
             <div class="form-group">
               <label for="cfg-hero-badge">Status Pill Label</label>
               <input type="text" id="cfg-hero-badge" class="admin-input" value="PIANIST & ELECTRONIC PRODUCER">
             </div>
             <div class="form-group">
-              <label for="cfg-hero-title">Artist Main Title</label>
+              <label for="cfg-hero-title">Artist Main Title (Hero &amp; Header)</label>
               <input type="text" id="cfg-hero-title" class="admin-input" value="BEL GRAY">
+            </div>
+            <div class="form-group">
+              <label for="cfg-site-realname">Header Subtitle (Real Name)</label>
+              <input type="text" id="cfg-site-realname" class="admin-input" value="Daniel Belyaev">
             </div>
           </div>
 
@@ -223,9 +237,40 @@
               <input type="text" id="cfg-hero-cta1" class="admin-input" value="Listen to 'Anxious Story'">
             </div>
             <div class="form-group">
+              <label for="cfg-hero-cta1-link">Primary Button Target URL / Anchor</label>
+              <input type="text" id="cfg-hero-cta1-link" class="admin-input" value="#latest" placeholder="#latest or https://band.link/...">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
               <label for="cfg-hero-cta2">Secondary Button Label</label>
               <input type="text" id="cfg-hero-cta2" class="admin-input" value="Meet Daniel">
             </div>
+            <div class="form-group">
+              <label for="cfg-hero-cta2-link">Secondary Button Target URL / Anchor</label>
+              <input type="text" id="cfg-hero-cta2-link" class="admin-input" value="#about" placeholder="#about or #discography">
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Hero Streaming Carousel (Artist Profile Links & Platforms) -->
+        <div class="admin-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;">
+            <div>
+              <h3 class="card-title" style="margin-bottom: 4px;">Hero Streaming Carousel — Artist Profile Links</h3>
+              <p class="card-desc" style="margin-bottom: 0;">Configure the platforms and your personal artist profile links displayed in the Hero marquee carousel (independent from per-release links).</p>
+            </div>
+            <button type="button" id="btn-add-hero-platform" class="btn btn-sm btn-outline">+ Add Platform</button>
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-hero-stream-label">Carousel Section Header Label</label>
+            <input type="text" id="cfg-hero-stream-label" class="admin-input" value="AVAILABLE WORLDWIDE • OFFICIAL STREAMING HUB" placeholder="AVAILABLE WORLDWIDE • OFFICIAL STREAMING HUB">
+          </div>
+
+          <div id="hero-platforms-rows" style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+            <!-- Populated dynamically via admin.js -->
           </div>
         </div>
       </section>
@@ -327,6 +372,61 @@
               </div>
             </div>
 
+            <!-- Direct Streaming Platform Links (Per Release) -->
+            <div class="form-group">
+              <details id="rel-platforms-details" style="background: #0B0B10; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px 14px;">
+                <summary style="cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-secondary); user-select: none;">
+                  Direct Streaming Platform Links (11 Platforms — Optional, falls back to Smartlink if left blank)
+                </summary>
+                <div class="form-grid-2" style="margin-top: 14px; gap: 10px;">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>Spotify URL</label>
+                    <input type="text" id="rel-link-spotify" class="admin-input" placeholder="https://open.spotify.com/...">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>Apple Music URL</label>
+                    <input type="text" id="rel-link-apple" class="admin-input" placeholder="https://music.apple.com/...">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>YouTube Music URL</label>
+                    <input type="text" id="rel-link-youtube" class="admin-input" placeholder="https://music.youtube.com/...">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>Яндекс Музыка URL</label>
+                    <input type="text" id="rel-link-yandex" class="admin-input" placeholder="https://music.yandex.ru/...">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>VK Музыка URL</label>
+                    <input type="text" id="rel-link-vk" class="admin-input" placeholder="https://vk.com/music/...">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>Звук (Zvuk) URL</label>
+                    <input type="text" id="rel-link-zvuk" class="admin-input" placeholder="https://zvuk.com/...">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>Deezer URL</label>
+                    <input type="text" id="rel-link-deezer" class="admin-input" placeholder="https://deezer.com/...">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>SoundCloud URL</label>
+                    <input type="text" id="rel-link-soundcloud" class="admin-input" placeholder="https://soundcloud.com/...">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>Amazon Music URL</label>
+                    <input type="text" id="rel-link-amazon" class="admin-input" placeholder="https://music.amazon.com/...">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>TIDAL URL</label>
+                    <input type="text" id="rel-link-tidal" class="admin-input" placeholder="https://tidal.com/...">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>TME (Tencent Music) URL</label>
+                    <input type="text" id="rel-link-tme" class="admin-input" placeholder="https://y.qq.com/...">
+                  </div>
+                </div>
+              </details>
+            </div>
+
             <div class="form-group">
               <label class="toggle-control">
                 <input type="checkbox" id="new-rel-featured" checked>
@@ -355,17 +455,21 @@
       <!-- Tab: Bio & Portrait -->
       <section id="tab-bio" class="admin-tab-pane">
         <div class="admin-card">
-          <h3 class="card-title">The Producer — Biography & Portrait</h3>
-          <p class="card-desc">Update your artist photo, narrative biography, and artistic quote in 1 click.</p>
+          <h3 class="card-title">The Producer — Biography, Portrait &amp; Studio Cards</h3>
+          <p class="card-desc">Update your artist photo, narrative biography, philosophical quote, and the 3 studio identity cards.</p>
 
-          <div class="form-grid-2">
+          <div class="form-grid-3">
             <div class="form-group">
               <label for="cfg-bio-photo">Portrait Image Path / URL</label>
               <input type="text" id="cfg-bio-photo" class="admin-input" value="assets/BGM Daniel Belyaev Photo.png">
             </div>
             <div class="form-group">
-              <label for="cfg-bio-cap-name">Badge Name</label>
+              <label for="cfg-bio-cap-name">Portrait Badge Name</label>
               <input type="text" id="cfg-bio-cap-name" class="admin-input" value="DANIEL BELYAEV">
+            </div>
+            <div class="form-group">
+              <label for="cfg-bio-cap-role">Portrait Badge Role</label>
+              <input type="text" id="cfg-bio-cap-role" class="admin-input" value="Electronic Producer & Pianist">
             </div>
           </div>
 
@@ -392,6 +496,44 @@
             <div class="form-group">
               <label for="cfg-bio-quote-author">Quote Author</label>
               <input type="text" id="cfg-bio-quote-author" class="admin-input" value="Bel Gray">
+            </div>
+          </div>
+
+          <div style="margin-top: 12px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+            <label style="display: block; font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;">
+              3 Studio Identity Cards (Under Biography)
+            </label>
+            <div class="form-grid-3">
+              <div style="background: #0B0B10; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px;">
+                <div class="form-group">
+                  <label for="cfg-bio-stat1-kicker">Card 1 Kicker</label>
+                  <input type="text" id="cfg-bio-stat1-kicker" class="admin-input" value="CORE INSTRUMENT">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="cfg-bio-stat1-val">Card 1 Value</label>
+                  <input type="text" id="cfg-bio-stat1-val" class="admin-input" value="Acoustic Piano">
+                </div>
+              </div>
+              <div style="background: #0B0B10; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px;">
+                <div class="form-group">
+                  <label for="cfg-bio-stat2-kicker">Card 2 Kicker</label>
+                  <input type="text" id="cfg-bio-stat2-kicker" class="admin-input" value="ENGINEERING">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="cfg-bio-stat2-val">Card 2 Value</label>
+                  <input type="text" id="cfg-bio-stat2-val" class="admin-input" value="FL Studio DAW">
+                </div>
+              </div>
+              <div style="background: #0B0B10; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px;">
+                <div class="form-group">
+                  <label for="cfg-bio-stat3-kicker">Card 3 Kicker</label>
+                  <input type="text" id="cfg-bio-stat3-kicker" class="admin-input" value="SOUND IDENTITY">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="cfg-bio-stat3-val">Card 3 Value</label>
+                  <input type="text" id="cfg-bio-stat3-val" class="admin-input" value="Melodic Prog House">
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -570,6 +712,82 @@
           <div class="form-group">
             <label for="cfg-footer-brand-desc">Footer Brand Subtitle</label>
             <textarea id="cfg-footer-brand-desc" class="admin-textarea" rows="2" placeholder="Acoustic piano keys, progressive house frequencies, and authentic human emotion.">Acoustic piano keys, progressive house frequencies, and authentic human emotion.</textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: SEO, Open Graph Social Banner & Analytics -->
+      <section id="tab-seo" class="admin-tab-pane">
+        <!-- Card 1: Open Graph & Social Media Banner -->
+        <div class="admin-card">
+          <h3 class="card-title">Social Media Link Preview &amp; 16:9 Banner (Telegram / VK / Discord / X)</h3>
+          <p class="card-desc">Control how your link looks when shared in Telegram, VK, or Discord. When connected to <code>server.py</code>, saving here automatically rewrites the raw HTML <code>&lt;meta&gt;</code> tags inside <code>index.html</code> so social bots see your changes immediately.</p>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-seo-og-title">Social Share Card Title (<code>og:title</code>)</label>
+              <input type="text" id="cfg-seo-og-title" class="admin-input" value="Bel Gray | Official Artist Hub" placeholder="Bel Gray | Official Artist Hub">
+            </div>
+            <div class="form-group">
+              <label for="cfg-seo-url">Canonical Public Site URL (<code>og:url</code>)</label>
+              <input type="text" id="cfg-seo-url" class="admin-input" value="https://cloud-belgray.com/belgray_artist/" placeholder="https://cloud-belgray.com/belgray_artist/">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-seo-og-desc">Social Share Card Description (<code>og:description</code> — No hardcode)</label>
+            <textarea id="cfg-seo-og-desc" class="admin-textarea" rows="2" placeholder="Electronic music producer & pianist Daniel Belyaev. Melodic progressive house meets acoustic piano.">Electronic music producer & pianist Daniel Belyaev. Melodic progressive house meets acoustic piano.</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-seo-og-image">16:9 Social Banner Image Path or Full URL (<code>og:image</code>, 1200×630 recommended)</label>
+            <input type="text" id="cfg-seo-og-image" class="admin-input" value="assets/og-banner.jpg" placeholder="assets/og-banner.jpg or https://cloud-belgray.com/belgray_artist/assets/og-banner.jpg">
+          </div>
+
+          <!-- Live Telegram / Social Link Preview Card -->
+          <div class="banner-preview-box" style="margin-top: 18px;">
+            <span class="preview-label">LIVE TELEGRAM / VK LINK PREVIEW</span>
+            <div style="max-width: 480px; background: #14141D; border-left: 3px solid var(--accent-color); border-radius: 8px; padding: 12px 14px; border-top: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);">
+              <div id="prev-og-domain" style="font-size: 11px; font-weight: 600; color: var(--accent-color); margin-bottom: 3px;">Bel Gray Official • cloud-belgray.com</div>
+              <div id="prev-og-title" style="font-size: 14px; font-weight: 600; color: #FFFFFF; margin-bottom: 4px;">Bel Gray | Official Artist Hub</div>
+              <div id="prev-og-desc" style="font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin-bottom: 10px;">Electronic music producer &amp; pianist Daniel Belyaev. Melodic progressive house meets acoustic piano.</div>
+              <div style="width: 100%; aspect-ratio: 16 / 9; background: #09090D; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-subtle); position: relative; display: flex; align-items: center; justify-content: center;">
+                <img id="prev-og-img" src="assets/og-banner.jpg" alt="OG Banner Preview" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Browser Tab, Search Engine Meta & Analytics -->
+        <div class="admin-card">
+          <h3 class="card-title">Browser Tab, Search Engine Meta &amp; Analytics</h3>
+          <p class="card-desc">Configure the browser tab title, search engine snippet, keywords, and optional Yandex Metrika / Google Analytics 4 counters.</p>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="cfg-seo-title">Browser Tab Title (<code>&lt;title&gt;</code>)</label>
+              <input type="text" id="cfg-seo-title" class="admin-input" value="Bel Gray | Official Music Hub & Discography">
+            </div>
+            <div class="form-group">
+              <label for="cfg-seo-keywords">SEO Keywords (Comma-separated)</label>
+              <input type="text" id="cfg-seo-keywords" class="admin-input" value="Bel Gray, Daniel Belyaev, Progressive House, Melodic House, Piano House, Neoclassical, FL Studio, Electronic Producer">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cfg-seo-meta-desc">Search Engine Meta Description (Google / Yandex)</label>
+            <textarea id="cfg-seo-meta-desc" class="admin-textarea" rows="2">Official website of electronic music producer, composer, and pianist Bel Gray (Daniel Belyaev). Explore the complete discography, studio craft, and melodic electronic soundscapes.</textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="cfg-seo-ym-id">Yandex Metrika Counter ID (Optional)</label>
+              <input type="text" id="cfg-seo-ym-id" class="admin-input" placeholder="e.g. 98765432 (leave blank to disable)">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="cfg-seo-ga-id">Google Analytics 4 ID (Optional)</label>
+              <input type="text" id="cfg-seo-ga-id" class="admin-input" placeholder="e.g. G-XXXXXXXXXX (leave blank to disable)">
+            </div>
           </div>
         </div>
       </section>

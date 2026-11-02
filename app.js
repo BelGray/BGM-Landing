@@ -195,11 +195,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const defaultConfig = {
     site: {
-      title: "Bel Gray | Electronic Producer & Pianist",
+      title: "Bel Gray | Official Music Hub & Discography",
       artistName: "Bel Gray",
       realName: "Daniel Belyaev",
       activeEraColor: "#FF5722",
       activeEraName: "Anxious Story Era"
+    },
+    seo: {
+      siteTitle: "Bel Gray | Official Music Hub & Discography",
+      metaDescription: "Official website of electronic music producer, composer, and pianist Bel Gray (Daniel Belyaev). Explore the complete discography, studio craft, and melodic electronic soundscapes.",
+      keywords: "Bel Gray, Daniel Belyaev, Progressive House, Melodic House, Piano House, Neoclassical, FL Studio, Electronic Producer",
+      ogTitle: "Bel Gray | Official Artist Hub",
+      ogDescription: "Electronic music producer & pianist Daniel Belyaev. Melodic progressive house meets acoustic piano.",
+      ogImage: "assets/og-banner.jpg",
+      canonicalUrl: "https://cloud-belgray.com/belgray_artist/",
+      yandexMetrikaId: "",
+      googleAnalyticsId: ""
     },
     hero: {
       badge: "PIANIST & ELECTRONIC PRODUCER",
@@ -208,8 +219,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       ctaPrimaryText: "Listen to 'Anxious Story'",
       ctaPrimaryLink: "#latest",
       ctaSecondaryText: "Meet Daniel",
-      ctaSecondaryLink: "#about"
+      ctaSecondaryLink: "#about",
+      streamingLabel: "AVAILABLE WORLDWIDE • OFFICIAL STREAMING HUB"
     },
+    streamingPlatforms: STREAMING_PLATFORMS.map(p => ({
+      key: p.key,
+      name: p.name,
+      tier: p.tier,
+      tierBadge: p.tierBadge,
+      icon: p.icon,
+      url: p.defaultUrl,
+      enabled: true
+    })),
     announcement: {
       enabled: true,
       badge: "OUT NOW",
@@ -294,9 +315,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       ...defaultConfig,
       ...parsedConfig,
       site: mergeNonEmpty(defaultConfig.site, parsedConfig.site),
+      seo: parsedConfig.seo ? {
+        ...defaultConfig.seo,
+        ...parsedConfig.seo
+      } : defaultConfig.seo,
       hero: mergeNonEmpty(defaultConfig.hero, parsedConfig.hero),
+      streamingPlatforms: Array.isArray(parsedConfig.streamingPlatforms) && parsedConfig.streamingPlatforms.length > 0
+        ? parsedConfig.streamingPlatforms
+        : JSON.parse(JSON.stringify(defaultConfig.streamingPlatforms)),
       announcement: mergeNonEmpty(defaultConfig.announcement, parsedConfig.announcement),
-      bio: mergeNonEmpty(defaultConfig.bio, parsedConfig.bio),
+      bio: {
+        ...mergeNonEmpty(defaultConfig.bio, parsedConfig.bio),
+        stats: Array.isArray(parsedConfig.bio?.stats) && parsedConfig.bio.stats.length > 0
+          ? parsedConfig.bio.stats
+          : defaultConfig.bio.stats
+      },
       documentary: mergeNonEmpty(defaultConfig.documentary, parsedConfig.documentary),
       socials: mergeNonEmpty(defaultConfig.socials, parsedConfig.socials),
       footer: parsedConfig.footer ? {
@@ -444,14 +477,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   let heroCarouselPaused = false;
   let heroCarouselInitialized = false;
 
-  const renderHeroStreamingCarousel = (latestRelease) => {
+  const getHeroStreamingPlatforms = () => {
+    const list = (Array.isArray(siteConfig.streamingPlatforms) && siteConfig.streamingPlatforms.length > 0)
+      ? siteConfig.streamingPlatforms
+      : defaultConfig.streamingPlatforms;
+    return list.filter(p => p && p.enabled !== false);
+  };
+
+  const resolveHeroArtistProfileUrl = (platform) => {
+    const fallbackHub = sanitizeUrl(siteConfig.footer?.smartlinkUrl || siteConfig.socials?.smartlink, 'https://band.link/anxious_story');
+    const profileUrl = platform?.url || platform?.defaultUrl;
+    if (profileUrl && typeof profileUrl === 'string' && profileUrl.trim() !== '') {
+      return sanitizeUrl(profileUrl, fallbackHub);
+    }
+    return fallbackHub;
+  };
+
+  const renderHeroStreamingCarousel = () => {
     const track = document.getElementById('hero-streaming-carousel-track');
     const viewport = document.getElementById('streaming-carousel-viewport');
+    const showcase = document.getElementById('streaming-showcase');
     if (!track || !viewport) return;
 
+    const activePlatforms = getHeroStreamingPlatforms();
+    if (showcase) {
+      showcase.style.display = activePlatforms.length === 0 ? 'none' : '';
+    }
+
     const filteredPlatforms = activeStreamTier === 'all'
-      ? STREAMING_PLATFORMS
-      : STREAMING_PLATFORMS.filter(p => p.tier === activeStreamTier);
+      ? activePlatforms
+      : activePlatforms.filter(p => p.tier === activeStreamTier);
 
     // When showing "all", duplicate the list once so the continuous marquee loops seamlessly
     const displayList = activeStreamTier === 'all'
@@ -461,20 +516,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     track.classList.toggle('is-filtered-static', activeStreamTier !== 'all');
 
     track.innerHTML = displayList.map((p, idx) => {
-      const targetUrl = resolvePlatformUrl(p, latestRelease);
+      const targetUrl = resolveHeroArtistProfileUrl(p);
       const isClone = activeStreamTier === 'all' && idx >= filteredPlatforms.length;
+      const safeIcon = sanitizeUrl(p.icon, 'assets/Spotify.svg');
+      const badgeLabel = p.tierBadge || (p.tier === 'ru' ? 'RUSSIA' : (p.tier === 'other' ? 'OTHER' : 'GLOBAL'));
       return `
         <a href="${escapeHtml(targetUrl)}"
            target="_blank"
            rel="noopener noreferrer"
-           class="stream-carousel-card tier-${escapeHtml(p.tier)}"
+           class="stream-carousel-card tier-${escapeHtml(p.tier || 'global')}"
            ${isClone ? 'aria-hidden="true" tabindex="-1"' : ''}>
           <div class="stream-card-icon-wrap">
-            <img src="${escapeHtml(p.icon)}" alt="${escapeHtml(p.name)}" class="stream-card-logo" loading="eager">
+            <img src="${escapeHtml(safeIcon)}" alt="${escapeHtml(p.name)}" class="stream-card-logo" loading="eager">
           </div>
           <div class="stream-card-body">
             <div class="stream-card-top-row">
-              <span class="stream-tier-badge">${escapeHtml(p.tierBadge)}</span>
+              <span class="stream-tier-badge">${escapeHtml(badgeLabel)}</span>
               <span class="stream-card-arrow">↗</span>
             </div>
             <span class="stream-card-name">${escapeHtml(p.name)}</span>
@@ -1150,12 +1207,71 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   };
 
-  // 12. Hydrate All Dynamic Sections (Hero, Bio, Documentary)
+  // 12. Hydrate All Dynamic Sections (SEO, Header, Hero, Bio, Documentary, Footer)
   const hydrateDynamicContent = (cfg) => {
     if (!cfg) return;
 
-    if (cfg.site?.title) {
-      document.title = cfg.site.title;
+    // SEO, Open Graph Meta & Optional Analytics
+    const seo = cfg.seo || defaultConfig.seo;
+    const activeTitle = seo.siteTitle || cfg.site?.title || defaultConfig.seo.siteTitle;
+    document.title = activeTitle;
+
+    const setMetaContent = (id, val) => {
+      const el = document.getElementById(id);
+      if (el && val) el.setAttribute('content', val);
+    };
+
+    const canonicalUrl = (seo.canonicalUrl || defaultConfig.seo.canonicalUrl).trim();
+    const rawOgImage = (seo.ogImage || defaultConfig.seo.ogImage).trim();
+    const resolvedOgImage = rawOgImage.startsWith('http')
+      ? rawOgImage
+      : `${canonicalUrl.replace(/\/+$/, '')}/${rawOgImage.replace(/^\.?\//, '')}`;
+
+    setMetaContent('meta-title', activeTitle);
+    setMetaContent('meta-desc', seo.metaDescription || defaultConfig.seo.metaDescription);
+    setMetaContent('meta-keywords', seo.keywords || defaultConfig.seo.keywords);
+    setMetaContent('og-title', seo.ogTitle || activeTitle);
+    setMetaContent('og-desc', seo.ogDescription || defaultConfig.seo.ogDescription);
+    setMetaContent('og-image', resolvedOgImage);
+    setMetaContent('og-url', canonicalUrl);
+    setMetaContent('tw-title', seo.ogTitle || activeTitle);
+    setMetaContent('tw-desc', seo.ogDescription || defaultConfig.seo.ogDescription);
+    setMetaContent('tw-image', resolvedOgImage);
+
+    // Optional Analytics Injection (Yandex Metrika & Google Analytics 4)
+    const ymId = String(seo.yandexMetrikaId || '').replace(/[^0-9]/g, '');
+    if (ymId && !window.__belgrayYmLoaded) {
+      window.__belgrayYmLoaded = true;
+      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();
+      for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+      (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+      window.ym(Number(ymId), "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
+    }
+
+    const gaId = String(seo.googleAnalyticsId || '').replace(/[^A-Za-z0-9\-]/g, '');
+    if (gaId && !window.__belgrayGaLoaded) {
+      window.__belgrayGaLoaded = true;
+      const gaScript = document.createElement('script');
+      gaScript.async = true;
+      gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId)}`;
+      document.head.appendChild(gaScript);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){window.dataLayer.push(arguments);}
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', gaId);
+    }
+
+    // Header Brand Identity
+    const headerBrandName = document.getElementById('header-brand-name');
+    const headerBrandSub = document.getElementById('header-brand-subtitle');
+    if (headerBrandName) {
+      headerBrandName.textContent = (cfg.hero?.title || cfg.site?.artistName || 'BEL GRAY').toUpperCase();
+    }
+    if (headerBrandSub) {
+      headerBrandSub.textContent = cfg.site?.realName || 'Daniel Belyaev';
     }
 
     // Hero Section
@@ -1165,9 +1281,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const heroSubtitle = document.getElementById('hero-subtitle');
       const heroCtaPrimary = document.getElementById('hero-cta-primary');
       const heroCtaSecondary = document.getElementById('hero-cta-secondary');
+      const heroStreamLabel = document.getElementById('hero-streaming-label');
 
       if (heroBadge && cfg.hero.badge) heroBadge.textContent = cfg.hero.badge;
       if (heroTitle && cfg.hero.title) heroTitle.textContent = cfg.hero.title;
+      if (heroStreamLabel && cfg.hero.streamingLabel) heroStreamLabel.textContent = cfg.hero.streamingLabel;
       if (heroSubtitle && cfg.hero.subtitle) {
         const escapedSub = escapeHtml(cfg.hero.subtitle);
         heroSubtitle.innerHTML = escapedSub.replace(/Daniel Belyaev/g, '<strong>Daniel Belyaev</strong>');

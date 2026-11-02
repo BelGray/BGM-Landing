@@ -266,11 +266,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 2. Complete Default State (Works 100% offline & over file:// protocol)
   const defaultSiteConfig = {
     site: {
-      title: "Bel Gray | Electronic Producer & Pianist",
+      title: "Bel Gray | Official Music Hub & Discography",
       artistName: "Bel Gray",
       realName: "Daniel Belyaev",
       activeEraColor: "#FF5722",
       activeEraName: "Anxious Story Era"
+    },
+    seo: {
+      siteTitle: "Bel Gray | Official Music Hub & Discography",
+      metaDescription: "Official website of electronic music producer, composer, and pianist Bel Gray (Daniel Belyaev). Explore the complete discography, studio craft, and melodic electronic soundscapes.",
+      keywords: "Bel Gray, Daniel Belyaev, Progressive House, Melodic House, Piano House, Neoclassical, FL Studio, Electronic Producer",
+      ogTitle: "Bel Gray | Official Artist Hub",
+      ogDescription: "Electronic music producer & pianist Daniel Belyaev. Melodic progressive house meets acoustic piano.",
+      ogImage: "assets/og-banner.jpg",
+      canonicalUrl: "https://cloud-belgray.com/belgray_artist/",
+      yandexMetrikaId: "",
+      googleAnalyticsId: ""
     },
     hero: {
       badge: "PIANIST & ELECTRONIC PRODUCER",
@@ -279,8 +290,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       ctaPrimaryText: "Listen to 'Anxious Story'",
       ctaPrimaryLink: "#latest",
       ctaSecondaryText: "Meet Daniel",
-      ctaSecondaryLink: "#about"
+      ctaSecondaryLink: "#about",
+      streamingLabel: "AVAILABLE WORLDWIDE • OFFICIAL STREAMING HUB"
     },
+    streamingPlatforms: [
+      { key: "spotify", name: "Spotify", tier: "global", tierBadge: "GLOBAL", icon: "assets/Spotify.svg", url: "https://open.spotify.com/artist/belgray", enabled: true },
+      { key: "apple", name: "Apple Music", tier: "global", tierBadge: "GLOBAL", icon: "assets/Apple Music.svg", url: "https://music.apple.com/artist/belgray", enabled: true },
+      { key: "youtube", name: "YouTube Music", tier: "global", tierBadge: "GLOBAL", icon: "assets/YouTube Music.svg", url: "https://youtube.com/@belgray_music", enabled: true },
+      { key: "amazon", name: "Amazon Music", tier: "global", tierBadge: "GLOBAL", icon: "assets/Amazon Music.svg", url: "https://band.link/anxious_story", enabled: true },
+      { key: "deezer", name: "Deezer", tier: "global", tierBadge: "GLOBAL", icon: "assets/Deezer.svg", url: "https://band.link/anxious_story", enabled: true },
+      { key: "soundcloud", name: "SoundCloud", tier: "global", tierBadge: "GLOBAL", icon: "assets/Soundcloud.svg", url: "https://band.link/anxious_story", enabled: true },
+      { key: "yandex", name: "Яндекс Музыка", tier: "ru", tierBadge: "RUSSIA", icon: "assets/Yandex Music.svg", url: "https://music.yandex.ru/artist/belgray", enabled: true },
+      { key: "vk", name: "VK Музыка", tier: "ru", tierBadge: "RUSSIA", icon: "assets/VK Music.svg", url: "https://vk.com/artist/belgray", enabled: true },
+      { key: "zvuk", name: "Звук", tier: "ru", tierBadge: "RUSSIA", icon: "assets/Zvuk.svg", url: "https://band.link/anxious_story", enabled: true },
+      { key: "tidal", name: "TIDAL", tier: "other", tierBadge: "OTHER", icon: "assets/Tidal.svg", url: "https://band.link/anxious_story", enabled: true },
+      { key: "tme", name: "TME", tier: "other", tierBadge: "OTHER", icon: "assets/TME.svg", url: "https://band.link/anxious_story", enabled: true }
+    ],
     announcement: {
       enabled: true,
       badge: "OUT NOW",
@@ -402,9 +427,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       ...defaultSiteConfig,
       ...parsed,
       site: mergeNonEmpty(defaultSiteConfig.site, parsed.site),
+      seo: parsed.seo ? {
+        ...defaultSiteConfig.seo,
+        ...parsed.seo
+      } : defaultSiteConfig.seo,
       hero: mergeNonEmpty(defaultSiteConfig.hero, parsed.hero),
+      streamingPlatforms: Array.isArray(parsed.streamingPlatforms) && parsed.streamingPlatforms.length > 0
+        ? parsed.streamingPlatforms
+        : JSON.parse(JSON.stringify(defaultSiteConfig.streamingPlatforms)),
       announcement: mergeNonEmpty(defaultSiteConfig.announcement, parsed.announcement),
-      bio: mergeNonEmpty(defaultSiteConfig.bio, parsed.bio),
+      bio: {
+        ...mergeNonEmpty(defaultSiteConfig.bio, parsed.bio),
+        stats: Array.isArray(parsed.bio?.stats) && parsed.bio.stats.length > 0
+          ? parsed.bio.stats
+          : defaultSiteConfig.bio.stats
+      },
       documentary: mergeNonEmpty(defaultSiteConfig.documentary, parsed.documentary),
       socials: mergeNonEmpty(defaultSiteConfig.socials, parsed.socials),
       footer: parsed.footer ? {
@@ -479,12 +516,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const tabTitles = {
     'tab-announcement': 'Hot Announcement Banner',
-    'tab-hero': 'Hero Section & Mission',
+    'tab-hero': 'Hero Section & Header Branding',
     'tab-releases': 'Discography & Releases Manager',
-    'tab-bio': 'The Producer — Bio & Portrait',
+    'tab-bio': 'The Producer — Bio, Portrait & Studio Cards',
     'tab-media': 'Documentary & Media Hub',
     'tab-theme': 'Era Theme & Visual Styling',
     'tab-footer': 'Footer, Socials & Copyright',
+    'tab-seo': 'SEO, Social Banner & Analytics',
     'tab-sync': 'Server & Python Micro-API'
   };
 
@@ -532,40 +570,202 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (el) el.addEventListener('input', updateBannerPreview);
   });
 
-  // 4B. Form Binding: Hero
+  // 4B. Form Binding: Hero, Header Branding & Hero Streaming Carousel (Artist Profile Links)
   const heroBadge = document.getElementById('cfg-hero-badge');
   const heroTitle = document.getElementById('cfg-hero-title');
+  const siteRealNameInput = document.getElementById('cfg-site-realname');
   const heroSubtitle = document.getElementById('cfg-hero-subtitle');
   const heroCta1 = document.getElementById('cfg-hero-cta1');
+  const heroCta1Link = document.getElementById('cfg-hero-cta1-link');
   const heroCta2 = document.getElementById('cfg-hero-cta2');
+  const heroCta2Link = document.getElementById('cfg-hero-cta2-link');
+  const heroStreamLabelInput = document.getElementById('cfg-hero-stream-label');
+  const heroPlatformsRowsMount = document.getElementById('hero-platforms-rows');
+  const btnAddHeroPlatform = document.getElementById('btn-add-hero-platform');
+
+  let editingHeroPlatforms = [];
+
+  const tierToBadge = (tier) => {
+    if (tier === 'ru') return 'RUSSIA';
+    if (tier === 'other') return 'OTHER';
+    return 'GLOBAL';
+  };
+
+  const syncHeroPlatformsFromDOM = () => {
+    if (!heroPlatformsRowsMount) return;
+    const rows = heroPlatformsRowsMount.querySelectorAll('.hero-platform-edit-row');
+    if (rows.length === 0 && editingHeroPlatforms.length === 0) return;
+    editingHeroPlatforms = Array.from(rows).map((row, idx) => {
+      const prev = editingHeroPlatforms[idx] || {};
+      const nameVal = row.querySelector('.hplat-name')?.value.trim() || prev.name || `Platform ${idx + 1}`;
+      const tierVal = row.querySelector('.hplat-tier')?.value || prev.tier || 'global';
+      const iconVal = sanitizeUrl(row.querySelector('.hplat-icon')?.value.trim() || prev.icon || 'assets/Spotify.svg', 'assets/Spotify.svg');
+      const urlVal = sanitizeUrl(row.querySelector('.hplat-url')?.value.trim() || prev.url || 'https://band.link/anxious_story', 'https://band.link/anxious_story');
+      const enabledVal = row.querySelector('.hplat-enabled') ? row.querySelector('.hplat-enabled').checked : true;
+      const slugKey = prev.key || nameVal.toLowerCase().replace(/[^a-z0-9]+/g, '') || `plat${idx + 1}`;
+      return {
+        key: slugKey,
+        name: nameVal,
+        tier: tierVal,
+        tierBadge: tierToBadge(tierVal),
+        icon: iconVal,
+        url: urlVal,
+        enabled: enabledVal
+      };
+    });
+  };
+
+  const renderHeroPlatformsRows = () => {
+    if (!heroPlatformsRowsMount) return;
+    if (editingHeroPlatforms.length === 0) {
+      heroPlatformsRowsMount.innerHTML = `
+        <div style="padding: 14px; background: #0B0B10; border: 1px dashed var(--border-medium); border-radius: var(--radius-sm); text-align: center; color: var(--text-muted); font-size: 13px;">
+          No platforms in Hero carousel. Click <strong>+ Add Platform</strong> to add one.
+        </div>
+      `;
+      return;
+    }
+
+    heroPlatformsRowsMount.innerHTML = editingHeroPlatforms.map((p, idx) => {
+      const isEnabled = p.enabled !== false;
+      const safeIcon = sanitizeUrl(p.icon, 'assets/Spotify.svg');
+      return `
+        <div class="hero-platform-edit-row" data-idx="${idx}" style="display: grid; grid-template-columns: 28px 34px 150px 115px 175px 1fr 64px; gap: 8px; align-items: center; background: #0C0C12; border: 1px solid var(--border-subtle); padding: 8px 10px; border-radius: var(--radius-sm); opacity: ${isEnabled ? '1' : '0.55'};">
+          <input type="checkbox" class="hplat-enabled" data-idx="${idx}" ${isEnabled ? 'checked' : ''} title="Show/hide platform in Hero carousel" style="width: 16px; height: 16px; accent-color: var(--accent-color); cursor: pointer; margin: 0 auto;">
+          <div style="width: 30px; height: 30px; border-radius: 6px; background: #14141D; border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <img src="${escapeHtml(safeIcon)}" alt="" style="width: 18px; height: 18px; object-fit: contain;" onerror="this.style.display='none'">
+          </div>
+          <input type="text" class="admin-input hplat-name" data-idx="${idx}" value="${escapeHtml(p.name || '')}" placeholder="Platform Name" title="Platform display name">
+          <select class="admin-select hplat-tier" data-idx="${idx}" title="Region filter tab">
+            <option value="global" ${p.tier === 'global' ? 'selected' : ''}>1. Global</option>
+            <option value="ru" ${p.tier === 'ru' ? 'selected' : ''}>2. Russia</option>
+            <option value="other" ${p.tier === 'other' ? 'selected' : ''}>3. Other</option>
+          </select>
+          <input type="text" class="admin-input hplat-icon" data-idx="${idx}" value="${escapeHtml(p.icon || '')}" placeholder="assets/Spotify.svg" title="Icon SVG/PNG path">
+          <input type="text" class="admin-input hplat-url" data-idx="${idx}" value="${escapeHtml(p.url || '')}" placeholder="https://open.spotify.com/artist/..." title="Artist Profile URL">
+          <div style="display: flex; gap: 2px; justify-content: flex-end;">
+            <button type="button" class="btn btn-sm btn-ghost btn-move-hplat-up" data-idx="${idx}" title="Move Up" style="padding: 4px 6px;" ${idx === 0 ? 'disabled' : ''}>↑</button>
+            <button type="button" class="btn btn-sm btn-ghost btn-move-hplat-down" data-idx="${idx}" title="Move Down" style="padding: 4px 6px;" ${idx === editingHeroPlatforms.length - 1 ? 'disabled' : ''}>↓</button>
+            <button type="button" class="btn btn-sm btn-ghost btn-remove-hplat" data-idx="${idx}" title="Remove Platform" style="color: #FF453A; padding: 4px 6px;">✕</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    heroPlatformsRowsMount.querySelectorAll('.hplat-enabled').forEach(cb => {
+      cb.addEventListener('change', () => {
+        syncHeroPlatformsFromDOM();
+        renderHeroPlatformsRows();
+      });
+    });
+
+    heroPlatformsRowsMount.querySelectorAll('.btn-move-hplat-up').forEach(btn => {
+      btn.addEventListener('click', () => {
+        syncHeroPlatformsFromDOM();
+        const i = parseInt(btn.dataset.idx, 10);
+        if (i > 0) {
+          const tmp = editingHeroPlatforms[i - 1];
+          editingHeroPlatforms[i - 1] = editingHeroPlatforms[i];
+          editingHeroPlatforms[i] = tmp;
+          renderHeroPlatformsRows();
+        }
+      });
+    });
+
+    heroPlatformsRowsMount.querySelectorAll('.btn-move-hplat-down').forEach(btn => {
+      btn.addEventListener('click', () => {
+        syncHeroPlatformsFromDOM();
+        const i = parseInt(btn.dataset.idx, 10);
+        if (i < editingHeroPlatforms.length - 1) {
+          const tmp = editingHeroPlatforms[i + 1];
+          editingHeroPlatforms[i + 1] = editingHeroPlatforms[i];
+          editingHeroPlatforms[i] = tmp;
+          renderHeroPlatformsRows();
+        }
+      });
+    });
+
+    heroPlatformsRowsMount.querySelectorAll('.btn-remove-hplat').forEach(btn => {
+      btn.addEventListener('click', () => {
+        syncHeroPlatformsFromDOM();
+        const i = parseInt(btn.dataset.idx, 10);
+        editingHeroPlatforms.splice(i, 1);
+        renderHeroPlatformsRows();
+      });
+    });
+  };
+
+  if (btnAddHeroPlatform) {
+    btnAddHeroPlatform.addEventListener('click', () => {
+      syncHeroPlatformsFromDOM();
+      editingHeroPlatforms.push({
+        key: `custom_${Date.now().toString().slice(-4)}`,
+        name: 'New Platform',
+        tier: 'global',
+        tierBadge: 'GLOBAL',
+        icon: 'assets/Spotify.svg',
+        url: 'https://band.link/anxious_story',
+        enabled: true
+      });
+      renderHeroPlatformsRows();
+    });
+  }
 
   const populateHeroForm = () => {
     const h = siteConfig.hero || defaultSiteConfig.hero;
+    const s = siteConfig.site || defaultSiteConfig.site;
     if (heroBadge) heroBadge.value = h.badge || defaultSiteConfig.hero.badge;
     if (heroTitle) heroTitle.value = h.title || defaultSiteConfig.hero.title;
+    if (siteRealNameInput) siteRealNameInput.value = s.realName || defaultSiteConfig.site.realName;
     if (heroSubtitle) heroSubtitle.value = h.subtitle || defaultSiteConfig.hero.subtitle;
     if (heroCta1) heroCta1.value = h.ctaPrimaryText || defaultSiteConfig.hero.ctaPrimaryText;
+    if (heroCta1Link) heroCta1Link.value = h.ctaPrimaryLink || defaultSiteConfig.hero.ctaPrimaryLink;
     if (heroCta2) heroCta2.value = h.ctaSecondaryText || defaultSiteConfig.hero.ctaSecondaryText;
+    if (heroCta2Link) heroCta2Link.value = h.ctaSecondaryLink || defaultSiteConfig.hero.ctaSecondaryLink;
+    if (heroStreamLabelInput) heroStreamLabelInput.value = h.streamingLabel || defaultSiteConfig.hero.streamingLabel;
+
+    if (Array.isArray(siteConfig.streamingPlatforms) && siteConfig.streamingPlatforms.length > 0) {
+      editingHeroPlatforms = JSON.parse(JSON.stringify(siteConfig.streamingPlatforms));
+    } else {
+      editingHeroPlatforms = JSON.parse(JSON.stringify(defaultSiteConfig.streamingPlatforms));
+    }
+    renderHeroPlatformsRows();
   };
 
-  // 4C. Form Binding: Bio & Portrait
+  // 4C. Form Binding: Bio, Portrait & 3 Studio Identity Cards
   const bioPhoto = document.getElementById('cfg-bio-photo');
   const bioCapName = document.getElementById('cfg-bio-cap-name');
+  const bioCapRole = document.getElementById('cfg-bio-cap-role');
   const bioLead = document.getElementById('cfg-bio-lead');
   const bioP1 = document.getElementById('cfg-bio-p1');
   const bioP2 = document.getElementById('cfg-bio-p2');
   const bioQuote = document.getElementById('cfg-bio-quote');
   const bioQuoteAuthor = document.getElementById('cfg-bio-quote-author');
+  const bioStat1Kicker = document.getElementById('cfg-bio-stat1-kicker');
+  const bioStat1Val = document.getElementById('cfg-bio-stat1-val');
+  const bioStat2Kicker = document.getElementById('cfg-bio-stat2-kicker');
+  const bioStat2Val = document.getElementById('cfg-bio-stat2-val');
+  const bioStat3Kicker = document.getElementById('cfg-bio-stat3-kicker');
+  const bioStat3Val = document.getElementById('cfg-bio-stat3-val');
 
   const populateBioForm = () => {
     const b = siteConfig.bio || defaultSiteConfig.bio;
     if (bioPhoto) bioPhoto.value = b.photoUrl || defaultSiteConfig.bio.photoUrl;
     if (bioCapName) bioCapName.value = b.captionName || defaultSiteConfig.bio.captionName;
+    if (bioCapRole) bioCapRole.value = b.captionRole || defaultSiteConfig.bio.captionRole;
     if (bioLead) bioLead.value = b.lead || defaultSiteConfig.bio.lead;
     if (bioP1) bioP1.value = b.paragraph1 || defaultSiteConfig.bio.paragraph1;
     if (bioP2) bioP2.value = b.paragraph2 || defaultSiteConfig.bio.paragraph2;
     if (bioQuote) bioQuote.value = b.quote || defaultSiteConfig.bio.quote;
     if (bioQuoteAuthor) bioQuoteAuthor.value = b.quoteAuthor || defaultSiteConfig.bio.quoteAuthor;
+
+    const st = Array.isArray(b.stats) && b.stats.length >= 3 ? b.stats : defaultSiteConfig.bio.stats;
+    if (bioStat1Kicker) bioStat1Kicker.value = st[0]?.kicker || defaultSiteConfig.bio.stats[0].kicker;
+    if (bioStat1Val) bioStat1Val.value = st[0]?.value || defaultSiteConfig.bio.stats[0].value;
+    if (bioStat2Kicker) bioStat2Kicker.value = st[1]?.kicker || defaultSiteConfig.bio.stats[1].kicker;
+    if (bioStat2Val) bioStat2Val.value = st[1]?.value || defaultSiteConfig.bio.stats[1].value;
+    if (bioStat3Kicker) bioStat3Kicker.value = st[2]?.kicker || defaultSiteConfig.bio.stats[2].kicker;
+    if (bioStat3Val) bioStat3Val.value = st[2]?.value || defaultSiteConfig.bio.stats[2].value;
   };
 
   // 4D. Form Binding: Documentary / Media
@@ -754,6 +954,63 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderFooterLinksRows();
   };
 
+  // 4G. Form Binding: SEO, Open Graph Social Banner & Analytics
+  const seoOgTitleInput = document.getElementById('cfg-seo-og-title');
+  const seoUrlInput = document.getElementById('cfg-seo-url');
+  const seoOgDescInput = document.getElementById('cfg-seo-og-desc');
+  const seoOgImageInput = document.getElementById('cfg-seo-og-image');
+  const seoTitleInput = document.getElementById('cfg-seo-title');
+  const seoKeywordsInput = document.getElementById('cfg-seo-keywords');
+  const seoMetaDescInput = document.getElementById('cfg-seo-meta-desc');
+  const seoYmIdInput = document.getElementById('cfg-seo-ym-id');
+  const seoGaIdInput = document.getElementById('cfg-seo-ga-id');
+
+  const prevOgDomain = document.getElementById('prev-og-domain');
+  const prevOgTitle = document.getElementById('prev-og-title');
+  const prevOgDesc = document.getElementById('prev-og-desc');
+  const prevOgImg = document.getElementById('prev-og-img');
+
+  const updateOgPreview = () => {
+    const rawUrl = (seoUrlInput?.value || defaultSiteConfig.seo.canonicalUrl).trim();
+    let hostLabel = 'cloud-belgray.com';
+    try {
+      const parsed = new URL(rawUrl);
+      if (parsed.hostname) hostLabel = parsed.hostname;
+    } catch (_) {}
+
+    if (prevOgDomain) prevOgDomain.textContent = `Bel Gray Official • ${hostLabel}`;
+    if (prevOgTitle) prevOgTitle.textContent = (seoOgTitleInput?.value || defaultSiteConfig.seo.ogTitle).trim();
+    if (prevOgDesc) prevOgDesc.textContent = (seoOgDescInput?.value || defaultSiteConfig.seo.ogDescription).trim();
+
+    if (prevOgImg) {
+      const rawImg = (seoOgImageInput?.value || defaultSiteConfig.seo.ogImage).trim();
+      const safeImg = sanitizeUrl(rawImg, 'assets/BGM Daniel Belyaev Photo.png');
+      prevOgImg.onerror = () => {
+        prevOgImg.onerror = null;
+        prevOgImg.src = 'assets/BGM Daniel Belyaev Photo.png';
+      };
+      prevOgImg.src = safeImg;
+    }
+  };
+
+  [seoOgTitleInput, seoUrlInput, seoOgDescInput, seoOgImageInput].forEach(el => {
+    if (el) el.addEventListener('input', updateOgPreview);
+  });
+
+  const populateSeoForm = () => {
+    const seo = siteConfig.seo || defaultSiteConfig.seo;
+    if (seoOgTitleInput) seoOgTitleInput.value = seo.ogTitle || defaultSiteConfig.seo.ogTitle;
+    if (seoUrlInput) seoUrlInput.value = seo.canonicalUrl || defaultSiteConfig.seo.canonicalUrl;
+    if (seoOgDescInput) seoOgDescInput.value = seo.ogDescription || defaultSiteConfig.seo.ogDescription;
+    if (seoOgImageInput) seoOgImageInput.value = seo.ogImage || defaultSiteConfig.seo.ogImage;
+    if (seoTitleInput) seoTitleInput.value = seo.siteTitle || siteConfig.site?.title || defaultSiteConfig.seo.siteTitle;
+    if (seoKeywordsInput) seoKeywordsInput.value = seo.keywords || defaultSiteConfig.seo.keywords;
+    if (seoMetaDescInput) seoMetaDescInput.value = seo.metaDescription || defaultSiteConfig.seo.metaDescription;
+    if (seoYmIdInput) seoYmIdInput.value = seo.yandexMetrikaId || '';
+    if (seoGaIdInput) seoGaIdInput.value = seo.googleAnalyticsId || '';
+    updateOgPreview();
+  };
+
   // 5. Theme Studio Binding with Dynamic Contrast Calculation
   const colorPicker = document.getElementById('cfg-theme-picker');
   const colorInput = document.getElementById('cfg-theme-color');
@@ -845,6 +1102,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   const relFeaturedCheckbox = document.getElementById('new-rel-featured');
   const tracklistRowsMount = document.getElementById('admin-tracklist-rows');
   const btnAddTrackRow = document.getElementById('btn-add-track-row');
+
+  const PLATFORM_KEYS = [
+    'spotify', 'apple', 'youtube', 'yandex', 'vk', 'zvuk',
+    'deezer', 'soundcloud', 'amazon', 'tidal', 'tme'
+  ];
+
+  const populateReleasePlatformInputs = (linksObj = {}) => {
+    PLATFORM_KEYS.forEach(k => {
+      const inp = document.getElementById(`rel-link-${k}`);
+      if (inp) inp.value = (linksObj && linksObj[k]) ? linksObj[k] : '';
+    });
+  };
+
+  const gatherReleasePlatformInputs = (fallbackSmartlink) => {
+    const out = {};
+    PLATFORM_KEYS.forEach(k => {
+      const inp = document.getElementById(`rel-link-${k}`);
+      const raw = inp ? inp.value.trim() : '';
+      out[k] = raw ? sanitizeUrl(raw, fallbackSmartlink) : fallbackSmartlink;
+    });
+    return out;
+  };
 
   if (relDatePicker && relDateInput) {
     relDatePicker.addEventListener('change', () => {
@@ -952,6 +1231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       { number: "01", title: "New Single", duration: "03:00", genre: "Melodic Progressive House", previewUrl: "" }
     ];
     renderTrackEditorRows();
+    populateReleasePlatformInputs({});
 
     addPanel.style.display = 'block';
   };
@@ -985,6 +1265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ? JSON.parse(JSON.stringify(rel.tracklist))
       : [{ number: "01", title: rel.title || "Track 01", duration: "03:00", genre: "Melodic Electronic", previewUrl: "" }];
     renderTrackEditorRows();
+    populateReleasePlatformInputs(rel.links || {});
 
     addPanel.style.display = 'block';
   };
@@ -1145,6 +1426,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           summary: craftSummary
         };
         existing.tracklist = finalTracks;
+        existing.links = gatherReleasePlatformInputs(smartlink);
         persistReleasesImmediate();
         renderReleasesAdmin();
         addPanel.style.display = 'none';
@@ -1171,13 +1453,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             summary: craftSummary
           },
           tracklist: finalTracks,
-          links: {
-            yandex: "https://music.yandex.ru/artist/belgray",
-            vk: "https://vk.com/artist/belgray",
-            spotify: "https://open.spotify.com/artist/belgray",
-            apple: "https://music.apple.com/artist/belgray",
-            youtube: "https://youtube.com/@belgray_music"
-          }
+          links: gatherReleasePlatformInputs(smartlink)
         };
 
         releases.unshift(newReleaseObj);
@@ -1254,6 +1530,7 @@ location /belgray_artist/ {
           populateBioForm();
           populateDocForm();
           populateFooterForm();
+          populateSeoForm();
           renderReleasesAdmin();
           showToast('Rolled back to previous SQLite snapshot!');
         } else {
@@ -1314,28 +1591,46 @@ location /belgray_artist/ {
         link: sanitizeUrl(bannerLink.value.trim(), defaultSiteConfig.announcement.link)
       };
 
-      // Gather siteConfig: Hero
+      // Gather siteConfig: Hero, Header Identity & Hero Streaming Carousel
+      syncHeroPlatformsFromDOM();
       siteConfig.hero = {
         badge: heroBadge.value.trim() || defaultSiteConfig.hero.badge,
         title: heroTitle.value.trim() || defaultSiteConfig.hero.title,
         subtitle: heroSubtitle.value.trim() || defaultSiteConfig.hero.subtitle,
         ctaPrimaryText: heroCta1.value.trim() || defaultSiteConfig.hero.ctaPrimaryText,
-        ctaPrimaryLink: '#latest',
+        ctaPrimaryLink: heroCta1Link ? sanitizeUrl(heroCta1Link.value.trim(), '#latest') : '#latest',
         ctaSecondaryText: heroCta2.value.trim() || defaultSiteConfig.hero.ctaSecondaryText,
-        ctaSecondaryLink: '#about'
+        ctaSecondaryLink: heroCta2Link ? sanitizeUrl(heroCta2Link.value.trim(), '#about') : '#about',
+        streamingLabel: heroStreamLabelInput ? (heroStreamLabelInput.value.trim() || defaultSiteConfig.hero.streamingLabel) : defaultSiteConfig.hero.streamingLabel
       };
+      siteConfig.streamingPlatforms = editingHeroPlatforms.length > 0
+        ? editingHeroPlatforms
+        : JSON.parse(JSON.stringify(defaultSiteConfig.streamingPlatforms));
 
-      // Gather siteConfig: Bio & Photo
+      // Gather siteConfig: Bio, Portrait & 3 Studio Cards
       siteConfig.bio = siteConfig.bio || {};
       siteConfig.bio.photoUrl = sanitizeUrl(bioPhoto.value.trim(), defaultSiteConfig.bio.photoUrl);
       siteConfig.bio.captionName = bioCapName.value.trim() || defaultSiteConfig.bio.captionName;
-      siteConfig.bio.captionRole = siteConfig.bio.captionRole || defaultSiteConfig.bio.captionRole;
+      siteConfig.bio.captionRole = bioCapRole ? (bioCapRole.value.trim() || defaultSiteConfig.bio.captionRole) : defaultSiteConfig.bio.captionRole;
       siteConfig.bio.lead = bioLead.value.trim() || defaultSiteConfig.bio.lead;
       siteConfig.bio.paragraph1 = bioP1.value.trim() || defaultSiteConfig.bio.paragraph1;
       siteConfig.bio.paragraph2 = bioP2.value.trim() || defaultSiteConfig.bio.paragraph2;
       siteConfig.bio.quote = bioQuote.value.trim() || defaultSiteConfig.bio.quote;
       siteConfig.bio.quoteAuthor = bioQuoteAuthor.value.trim() || defaultSiteConfig.bio.quoteAuthor;
-      siteConfig.bio.stats = Array.isArray(siteConfig.bio.stats) ? siteConfig.bio.stats : defaultSiteConfig.bio.stats;
+      siteConfig.bio.stats = [
+        {
+          kicker: bioStat1Kicker ? (bioStat1Kicker.value.trim() || defaultSiteConfig.bio.stats[0].kicker) : defaultSiteConfig.bio.stats[0].kicker,
+          value: bioStat1Val ? (bioStat1Val.value.trim() || defaultSiteConfig.bio.stats[0].value) : defaultSiteConfig.bio.stats[0].value
+        },
+        {
+          kicker: bioStat2Kicker ? (bioStat2Kicker.value.trim() || defaultSiteConfig.bio.stats[1].kicker) : defaultSiteConfig.bio.stats[1].kicker,
+          value: bioStat2Val ? (bioStat2Val.value.trim() || defaultSiteConfig.bio.stats[1].value) : defaultSiteConfig.bio.stats[1].value
+        },
+        {
+          kicker: bioStat3Kicker ? (bioStat3Kicker.value.trim() || defaultSiteConfig.bio.stats[2].kicker) : defaultSiteConfig.bio.stats[2].kicker,
+          value: bioStat3Val ? (bioStat3Val.value.trim() || defaultSiteConfig.bio.stats[2].value) : defaultSiteConfig.bio.stats[2].value
+        }
+      ];
 
       // Gather siteConfig: Documentary
       siteConfig.documentary = {
@@ -1376,11 +1671,26 @@ location /belgray_artist/ {
         else if (t.includes('tiktok') || t.includes('тикток')) siteConfig.socials.tiktok = l.url;
       });
 
-      // Gather & Sync Active Era Theme Color
+      // Gather & Sync Active Era Theme Color + Site Identity + SEO & Social Banner
       const validEraHex = normalizeHexColor(colorInput.value, '#FF5722');
       applyColorAdmin(validEraHex);
+      siteConfig.seo = {
+        siteTitle: seoTitleInput ? (seoTitleInput.value.trim() || defaultSiteConfig.seo.siteTitle) : defaultSiteConfig.seo.siteTitle,
+        metaDescription: seoMetaDescInput ? (seoMetaDescInput.value.trim() || defaultSiteConfig.seo.metaDescription) : defaultSiteConfig.seo.metaDescription,
+        keywords: seoKeywordsInput ? (seoKeywordsInput.value.trim() || defaultSiteConfig.seo.keywords) : defaultSiteConfig.seo.keywords,
+        ogTitle: seoOgTitleInput ? (seoOgTitleInput.value.trim() || defaultSiteConfig.seo.ogTitle) : defaultSiteConfig.seo.ogTitle,
+        ogDescription: seoOgDescInput ? (seoOgDescInput.value.trim() || defaultSiteConfig.seo.ogDescription) : defaultSiteConfig.seo.ogDescription,
+        ogImage: seoOgImageInput ? sanitizeUrl(seoOgImageInput.value.trim(), defaultSiteConfig.seo.ogImage) : defaultSiteConfig.seo.ogImage,
+        canonicalUrl: seoUrlInput ? sanitizeUrl(seoUrlInput.value.trim(), defaultSiteConfig.seo.canonicalUrl) : defaultSiteConfig.seo.canonicalUrl,
+        yandexMetrikaId: seoYmIdInput ? seoYmIdInput.value.trim().replace(/[^0-9]/g, '') : '',
+        googleAnalyticsId: seoGaIdInput ? seoGaIdInput.value.trim().replace(/[^A-Za-z0-9\-]/g, '') : ''
+      };
+
       siteConfig.site = siteConfig.site || {};
       siteConfig.site.activeEraColor = validEraHex;
+      siteConfig.site.title = siteConfig.seo.siteTitle;
+      siteConfig.site.artistName = siteConfig.hero.title || defaultSiteConfig.site.artistName;
+      siteConfig.site.realName = siteRealNameInput ? (siteRealNameInput.value.trim() || defaultSiteConfig.site.realName) : defaultSiteConfig.site.realName;
 
       // Also sync featured release accentColor so there is zero conflict
       const featuredRel = releases.find(r => r.isLatest) || releases[0];
@@ -1393,7 +1703,7 @@ location /belgray_artist/ {
       persistReleasesImmediate();
 
       showToast(serverApiConnected
-        ? 'All changes saved to Python SQLite Server!'
+        ? 'All changes saved to Python SQLite Server & HTML Meta!'
         : 'All changes saved! Live site updated.');
     });
   }
@@ -1415,6 +1725,7 @@ location /belgray_artist/ {
   populateBioForm();
   populateDocForm();
   populateFooterForm();
+  populateSeoForm();
   populateServerApiForm();
   renderReleasesAdmin();
 });

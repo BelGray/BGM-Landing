@@ -25,10 +25,12 @@ from __future__ import annotations
 
 import datetime
 import hmac
+import html
 import json
 import mimetypes
 import os
 import posixpath
+import re
 import signal
 import sqlite3
 import sys
@@ -36,13 +38,14 @@ import threading
 import time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import quote, unquote, urlparse
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "belgray.db"
 CONFIG_JSON_PATH = DATA_DIR / "site-config.json"
 RELEASES_JSON_PATH = DATA_DIR / "releases.json"
+INDEX_HTML_PATH = BASE_DIR / "index.html"
 
 # Default salted SHA-256 hash of the Studio PIN (matches admin.js DEFAULT_PIN_HASH)
 DEFAULT_PIN_HASH = os.environ.get(
@@ -95,6 +98,93 @@ def write_json_atomic(path: Path, data) -> None:
         tmp_path.replace(path)
     except Exception as exc:
         print(f"[WARN] Could not mirror JSON to {path.name}: {exc}")
+
+
+def sync_index_html_meta(site_config: dict) -> None:
+    """
+    Atomically rewrites <title> and Open Graph / Twitter / SEO <meta> tags inside `index.html`
+    whenever Studio Control saves `siteConfig`. This ensures Telegram, VK, Discord, and X
+    link-preview bots (which do not execute JS) always scrape the latest social banner & text!
+    """
+    if not isinstance(site_config, dict) or not INDEX_HTML_PATH.exists():
+        return
+    try:
+        seo = site_config.get("seo") if isinstance(site_config.get("seo"), dict) else {}
+        site = site_config.get("site") if isinstance(site_config.get("site"), dict) else {}
+
+        site_title = str(
+            seo.get("siteTitle")
+            or site.get("title")
+            or "Bel Gray | Official Music Hub & Discography"
+        ).strip()
+        meta_desc = str(
+            seo.get("metaDescription")
+            or "Official website of electronic music producer, composer, and pianist Bel Gray (Daniel Belyaev). Explore the complete discography, studio craft, and melodic electronic soundscapes."
+        ).strip()
+        keywords = str(
+            seo.get("keywords")
+            or "Bel Gray, Daniel Belyaev, Progressive House, Melodic House, Piano House, Neoclassical, FL Studio, Electronic Producer"
+        ).strip()
+        og_title = str(
+            seo.get("ogTitle") or site_title or "Bel Gray | Official Artist Hub"
+        ).strip()
+        og_desc = str(
+            seo.get("ogDescription")
+            or "Electronic music producer & pianist Daniel Belyaev. Melodic progressive house meets acoustic piano."
+        ).strip()
+        canonical_url = str(
+            seo.get("canonicalUrl") or "https://cloud-belgray.com/belgray_artist/"
+        ).strip()
+        if not canonical_url.endswith("/"):
+            canonical_url += "/"
+
+        raw_og_image = str(seo.get("ogImage") or "assets/og-banner.jpg").strip()
+        if raw_og_image.startswith(("http://", "https://")):
+            og_image_url = raw_og_image
+        else:
+            clean_rel = raw_og_image.lstrip("./")
+            # Encode spaces safely while preserving slashes
+            encoded_rel = "/".join(quote(part) for part in clean_rel.split("/"))
+            og_image_url = canonical_url + encoded_rel
+
+        content = INDEX_HTML_PATH.read_text(encoding="utf-8")
+
+        def replace_meta_by_id(html_text: str, meta_id: str, new_val: str) -> str:
+            escaped_val = html.escape(new_val, quote=True)
+            pattern = rf'(<meta\s+[^>]*id="{re.escape(meta_id)}"[^>]*content=")[^"]*(")'
+            return re.sub(pattern, lambda m: f"{m.group(1)}{escaped_val}{m.group(2)}", html_text)
+
+        # Update <title>
+        escaped_title = html.escape(site_title)
+        content = re.sub(
+            r'(<title(?:\s+id="page-title")?>).*?(</title>)',
+            lambda m: f"{m.group(1)}{escaped_title}{m.group(2)}",
+            content,
+            count=1,
+            flags=re.DOTALL,
+        )
+
+        # Update <meta> tags by id
+        meta_updates = {
+            "meta-title": site_title,
+            "meta-desc": meta_desc,
+            "meta-keywords": keywords,
+            "og-title": og_title,
+            "og-desc": og_desc,
+            "og-image": og_image_url,
+            "og-url": canonical_url,
+            "tw-title": og_title,
+            "tw-desc": og_desc,
+            "tw-image": og_image_url,
+        }
+        for mid, mval in meta_updates.items():
+            content = replace_meta_by_id(content, mid, mval)
+
+        tmp_html = INDEX_HTML_PATH.with_suffix(".html.tmp")
+        tmp_html.write_text(content, encoding="utf-8", newline="\n")
+        tmp_html.replace(INDEX_HTML_PATH)
+    except Exception as exc:
+        print(f"[WARN] Could not sync meta tags to index.html: {exc}")
 
 
 # =============================================================================
@@ -316,6 +406,7 @@ def db_save_state(site_config=None, releases=None) -> str:
                 (json.dumps(site_config, ensure_ascii=False), now),
             )
             write_json_atomic(CONFIG_JSON_PATH, site_config)
+            sync_index_html_meta(site_config)
 
         if releases is not None:
             cur.execute(
@@ -358,7 +449,9 @@ def db_rollback_latest() -> tuple[bool, str]:
         conn.commit()
 
         try:
-            write_json_atomic(CONFIG_JSON_PATH, json.loads(snap_cfg_str))
+            restored_cfg = json.loads(snap_cfg_str)
+            write_json_atomic(CONFIG_JSON_PATH, restored_cfg)
+            sync_index_html_meta(restored_cfg)
             write_json_atomic(RELEASES_JSON_PATH, json.loads(snap_rel_str))
         except Exception:
             pass

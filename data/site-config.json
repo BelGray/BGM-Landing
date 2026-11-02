@@ -1,10 +1,21 @@
 {
   "site": {
-    "title": "Bel Gray | Electronic Producer & Pianist",
+    "title": "Bel Gray | Official Music Hub & Discography",
     "artistName": "Bel Gray",
     "realName": "Daniel Belyaev",
     "activeEraColor": "#FF5722",
     "activeEraName": "Anxious Story Era"
+  },
+  "seo": {
+    "siteTitle": "Bel Gray | Official Music Hub & Discography",
+    "metaDescription": "Official website of electronic music producer, composer, and pianist Bel Gray (Daniel Belyaev). Explore the complete discography, studio craft, and melodic electronic soundscapes.",
+    "keywords": "Bel Gray, Daniel Belyaev, Progressive House, Melodic House, Piano House, Neoclassical, FL Studio, Electronic Producer",
+    "ogTitle": "Bel Gray | Official Artist Hub",
+    "ogDescription": "Electronic music producer & pianist Daniel Belyaev. Melodic progressive house meets acoustic piano.",
+    "ogImage": "assets/og-banner.jpg",
+    "canonicalUrl": "https://cloud-belgray.com/belgray_artist/",
+    "yandexMetrikaId": "",
+    "googleAnalyticsId": ""
   },
   "hero": {
     "badge": "PIANIST & ELECTRONIC PRODUCER",
@@ -13,8 +24,110 @@
     "ctaPrimaryText": "Listen to 'Anxious Story'",
     "ctaPrimaryLink": "#latest",
     "ctaSecondaryText": "Meet Daniel",
-    "ctaSecondaryLink": "#about"
+    "ctaSecondaryLink": "#about",
+    "streamingLabel": "AVAILABLE WORLDWIDE • OFFICIAL STREAMING HUB"
   },
+  "streamingPlatforms": [
+    {
+      "key": "spotify",
+      "name": "Spotify",
+      "tier": "global",
+      "tierBadge": "GLOBAL",
+      "icon": "assets/Spotify.svg",
+      "url": "https://open.spotify.com/artist/belgray",
+      "enabled": true
+    },
+    {
+      "key": "apple",
+      "name": "Apple Music",
+      "tier": "global",
+      "tierBadge": "GLOBAL",
+      "icon": "assets/Apple Music.svg",
+      "url": "https://music.apple.com/artist/belgray",
+      "enabled": true
+    },
+    {
+      "key": "youtube",
+      "name": "YouTube Music",
+      "tier": "global",
+      "tierBadge": "GLOBAL",
+      "icon": "assets/YouTube Music.svg",
+      "url": "https://youtube.com/@belgray_music",
+      "enabled": true
+    },
+    {
+      "key": "amazon",
+      "name": "Amazon Music",
+      "tier": "global",
+      "tierBadge": "GLOBAL",
+      "icon": "assets/Amazon Music.svg",
+      "url": "https://band.link/anxious_story",
+      "enabled": true
+    },
+    {
+      "key": "deezer",
+      "name": "Deezer",
+      "tier": "global",
+      "tierBadge": "GLOBAL",
+      "icon": "assets/Deezer.svg",
+      "url": "https://band.link/anxious_story",
+      "enabled": true
+    },
+    {
+      "key": "soundcloud",
+      "name": "SoundCloud",
+      "tier": "global",
+      "tierBadge": "GLOBAL",
+      "icon": "assets/Soundcloud.svg",
+      "url": "https://band.link/anxious_story",
+      "enabled": true
+    },
+    {
+      "key": "yandex",
+      "name": "Яндекс Музыка",
+      "tier": "ru",
+      "tierBadge": "RUSSIA",
+      "icon": "assets/Yandex Music.svg",
+      "url": "https://music.yandex.ru/artist/belgray",
+      "enabled": true
+    },
+    {
+      "key": "vk",
+      "name": "VK Музыка",
+      "tier": "ru",
+      "tierBadge": "RUSSIA",
+      "icon": "assets/VK Music.svg",
+      "url": "https://vk.com/artist/belgray",
+      "enabled": true
+    },
+    {
+      "key": "zvuk",
+      "name": "Звук",
+      "tier": "ru",
+      "tierBadge": "RUSSIA",
+      "icon": "assets/Zvuk.svg",
+      "url": "https://band.link/anxious_story",
+      "enabled": true
+    },
+    {
+      "key": "tidal",
+      "name": "TIDAL",
+      "tier": "other",
+      "tierBadge": "OTHER",
+      "icon": "assets/Tidal.svg",
+      "url": "https://band.link/anxious_story",
+      "enabled": true
+    },
+    {
+      "key": "tme",
+      "name": "TME",
+      "tier": "other",
+      "tierBadge": "OTHER",
+      "icon": "assets/TME.svg",
+      "url": "https://band.link/anxious_story",
+      "enabled": true
+    }
+  ],
   "announcement": {
     "enabled": true,
     "badge": "OUT NOW",
