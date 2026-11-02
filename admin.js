@@ -984,10 +984,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (prevOgImg) {
       const rawImg = (seoOgImageInput?.value || defaultSiteConfig.seo.ogImage).trim();
-      const safeImg = sanitizeUrl(rawImg, 'assets/BGM Daniel Belyaev Photo.png');
+      const safeImg = sanitizeUrl(rawImg, 'assets/og-banner.jpg');
       prevOgImg.onerror = () => {
         prevOgImg.onerror = null;
-        prevOgImg.src = 'assets/BGM Daniel Belyaev Photo.png';
+        prevOgImg.src = 'assets/og-banner.jpg';
       };
       prevOgImg.src = safeImg;
     }
