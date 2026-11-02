@@ -288,53 +288,91 @@ document.addEventListener('DOMContentLoaded', async () => {
     return result;
   };
 
-  // 2. Load Data (LocalStorage / Supabase Cloud / JSON Fallbacks)
+  const mergeFullConfig = (parsedConfig) => {
+    if (!parsedConfig || typeof parsedConfig !== 'object') return JSON.parse(JSON.stringify(defaultConfig));
+    return {
+      ...defaultConfig,
+      ...parsedConfig,
+      site: mergeNonEmpty(defaultConfig.site, parsedConfig.site),
+      hero: mergeNonEmpty(defaultConfig.hero, parsedConfig.hero),
+      announcement: mergeNonEmpty(defaultConfig.announcement, parsedConfig.announcement),
+      bio: mergeNonEmpty(defaultConfig.bio, parsedConfig.bio),
+      documentary: mergeNonEmpty(defaultConfig.documentary, parsedConfig.documentary),
+      socials: mergeNonEmpty(defaultConfig.socials, parsedConfig.socials),
+      footer: parsedConfig.footer ? {
+        ...defaultConfig.footer,
+        ...parsedConfig.footer,
+        links: Array.isArray(parsedConfig.footer.links) ? parsedConfig.footer.links : defaultConfig.footer.links
+      } : defaultConfig.footer
+    };
+  };
+
+  // 2. Load Data (Python + SQLite Micro-API -> LocalStorage -> JSON Fallbacks)
   const loadStateData = async () => {
+    let loadedFromServer = false;
+
+    // 2A. Try Self-Hosted Python + SQLite Micro-API (`api/state`) when running over HTTP/HTTPS
     try {
-      const savedConfig = localStorage.getItem('belgray_site_config');
-      const savedReleases = localStorage.getItem('belgray_releases');
-
-      if (savedConfig) {
-        const parsedConfig = JSON.parse(savedConfig);
-        siteConfig = {
-          ...defaultConfig,
-          ...parsedConfig,
-          site: mergeNonEmpty(defaultConfig.site, parsedConfig.site),
-          hero: mergeNonEmpty(defaultConfig.hero, parsedConfig.hero),
-          announcement: mergeNonEmpty(defaultConfig.announcement, parsedConfig.announcement),
-          bio: mergeNonEmpty(defaultConfig.bio, parsedConfig.bio),
-          documentary: mergeNonEmpty(defaultConfig.documentary, parsedConfig.documentary),
-          socials: mergeNonEmpty(defaultConfig.socials, parsedConfig.socials),
-          footer: parsedConfig.footer ? {
-            ...defaultConfig.footer,
-            ...parsedConfig.footer,
-            links: Array.isArray(parsedConfig.footer.links) ? parsedConfig.footer.links : defaultConfig.footer.links
-          } : defaultConfig.footer
-        };
-      } else {
-        const resConfig = await fetch('data/site-config.json');
-        if (resConfig.ok) siteConfig = await resConfig.json();
+      let apiBase = 'api';
+      const savedApiCfg = localStorage.getItem('belgray_api_cfg');
+      if (savedApiCfg) {
+        const parsedApi = JSON.parse(savedApiCfg);
+        if (parsedApi && parsedApi.url) apiBase = parsedApi.url.replace(/\/+$/, '');
       }
 
-      if (savedReleases) {
-        const parsedReleases = JSON.parse(savedReleases);
-        if (Array.isArray(parsedReleases) && parsedReleases.length > 0) {
-          releases = parsedReleases.filter(r => r && r.id !== 'the-storm-acoustic');
-          if (releases.length !== parsedReleases.length) {
-            localStorage.setItem('belgray_releases', JSON.stringify(releases));
-          }
-        }
-      } else {
-        const resReleases = await fetch('data/releases.json');
-        if (resReleases.ok) {
-          const jsonReleases = await resReleases.json();
-          if (Array.isArray(jsonReleases) && jsonReleases.length > 0) {
-            releases = jsonReleases;
+      if (window.location.protocol.startsWith('http') || apiBase.startsWith('http')) {
+        const resApi = await fetch(`${apiBase}/state`, { cache: 'no-store' });
+        if (resApi.ok) {
+          const payload = await resApi.json();
+          if (payload && payload.ok) {
+            if (payload.siteConfig && Object.keys(payload.siteConfig).length > 0) {
+              siteConfig = mergeFullConfig(payload.siteConfig);
+              localStorage.setItem('belgray_site_config', JSON.stringify(siteConfig));
+            }
+            if (Array.isArray(payload.releases) && payload.releases.length > 0) {
+              releases = payload.releases.filter(r => r && r.id !== 'the-storm-acoustic');
+              localStorage.setItem('belgray_releases', JSON.stringify(releases));
+            }
+            loadedFromServer = true;
           }
         }
       }
-    } catch (err) {
-      console.info('Loaded with embedded static data:', err.message);
+    } catch (_) {
+      // Python API not active in static/file:// mode — fall back to localStorage / static JSON
+    }
+
+    if (!loadedFromServer) {
+      try {
+        const savedConfig = localStorage.getItem('belgray_site_config');
+        const savedReleases = localStorage.getItem('belgray_releases');
+
+        if (savedConfig) {
+          siteConfig = mergeFullConfig(JSON.parse(savedConfig));
+        } else {
+          const resConfig = await fetch('data/site-config.json');
+          if (resConfig.ok) siteConfig = mergeFullConfig(await resConfig.json());
+        }
+
+        if (savedReleases) {
+          const parsedReleases = JSON.parse(savedReleases);
+          if (Array.isArray(parsedReleases) && parsedReleases.length > 0) {
+            releases = parsedReleases.filter(r => r && r.id !== 'the-storm-acoustic');
+            if (releases.length !== parsedReleases.length) {
+              localStorage.setItem('belgray_releases', JSON.stringify(releases));
+            }
+          }
+        } else {
+          const resReleases = await fetch('data/releases.json');
+          if (resReleases.ok) {
+            const jsonReleases = await resReleases.json();
+            if (Array.isArray(jsonReleases) && jsonReleases.length > 0) {
+              releases = jsonReleases;
+            }
+          }
+        }
+      } catch (err) {
+        console.info('Loaded with embedded static data:', err.message);
+      }
     }
 
     if (!Array.isArray(releases) || releases.length === 0) {

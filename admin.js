@@ -128,13 +128,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.removeItem('belgray_admin_pin');
   }
 
+  const getApiBaseUrl = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('belgray_api_cfg') || '{}');
+      if (saved && saved.url && saved.url.trim()) {
+        return saved.url.trim().replace(/\/+$/, '');
+      }
+    } catch (_) {}
+    return 'api';
+  };
+
+  const getActivePinHash = () => {
+    return (
+      sessionStorage.getItem('belgray_session_pin_hash') ||
+      localStorage.getItem('belgray_admin_pin_hash') ||
+      DEFAULT_PIN_HASH
+    );
+  };
+
   const isUnlocked = sessionStorage.getItem('belgray_admin_unlocked');
   if (isUnlocked === 'true') {
     authGate.style.display = 'none';
     dashboard.style.display = 'grid';
   }
 
-  authForm.addEventListener('submit', (e) => {
+  authForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const lockoutUntil = parseInt(sessionStorage.getItem('belgray_auth_lockout') || '0', 10);
@@ -149,10 +167,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     const enteredHash = sha256Salted(enteredPin);
     const expectedHash = localStorage.getItem('belgray_admin_pin_hash') || DEFAULT_PIN_HASH;
 
-    if (enteredHash === expectedHash) {
+    let authorized = (enteredHash === expectedHash);
+
+    // Also check against Python Micro-API (`POST api/auth`) in case PIN was updated from another device
+    if (!authorized) {
+      try {
+        const apiBase = getApiBaseUrl();
+        if (window.location.protocol.startsWith('http') || apiBase.startsWith('http')) {
+          const res = await fetch(`${apiBase}/auth`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Studio-Pin-Hash': enteredHash },
+            body: JSON.stringify({ pinHash: enteredHash })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.ok) {
+              authorized = true;
+              localStorage.setItem('belgray_admin_pin_hash', enteredHash);
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (authorized) {
       sessionStorage.removeItem('belgray_auth_attempts');
       sessionStorage.removeItem('belgray_auth_lockout');
       sessionStorage.setItem('belgray_admin_unlocked', 'true');
+      sessionStorage.setItem('belgray_session_pin_hash', enteredHash);
       pinInput.value = '';
       authGate.style.display = 'none';
       dashboard.style.display = 'grid';
@@ -178,23 +220,46 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (btnLock) {
     btnLock.addEventListener('click', () => {
       sessionStorage.removeItem('belgray_admin_unlocked');
+      sessionStorage.removeItem('belgray_session_pin_hash');
       location.reload();
     });
   }
 
-  // Update Studio PIN handler
+  // Update Studio PIN handler (syncs to both localStorage and Python SQLite Server)
   const newPinInput = document.getElementById('cfg-new-pin');
   const btnUpdatePin = document.getElementById('btn-update-pin');
   if (btnUpdatePin && newPinInput) {
-    btnUpdatePin.addEventListener('click', () => {
+    btnUpdatePin.addEventListener('click', async () => {
       const val = newPinInput.value.trim();
       if (val.length < 4 || val.length > 12) {
         showToast('PIN must be between 4 and 12 characters.');
         return;
       }
-      localStorage.setItem('belgray_admin_pin_hash', sha256Salted(val));
+      const prevHash = getActivePinHash();
+      const newHash = sha256Salted(val);
+      localStorage.setItem('belgray_admin_pin_hash', newHash);
+      sessionStorage.setItem('belgray_session_pin_hash', newHash);
       newPinInput.value = '';
-      showToast('Studio PIN updated and hashed!');
+
+      let serverPinUpdated = false;
+      try {
+        const apiBase = getApiBaseUrl();
+        if (window.location.protocol.startsWith('http') || apiBase.startsWith('http')) {
+          const res = await fetch(`${apiBase}/pin`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Studio-Pin-Hash': prevHash
+            },
+            body: JSON.stringify({ currentPinHash: prevHash, newPinHash: newHash })
+          });
+          if (res.ok) serverPinUpdated = true;
+        }
+      } catch (_) {}
+
+      showToast(serverPinUpdated
+        ? 'Studio PIN updated on server & local session!'
+        : 'Studio PIN updated and hashed locally!');
     });
   }
 
@@ -331,51 +396,80 @@ document.addEventListener('DOMContentLoaded', async () => {
     return result;
   };
 
+  const mergeFullAdminConfig = (parsed) => {
+    if (!parsed || typeof parsed !== 'object') return JSON.parse(JSON.stringify(defaultSiteConfig));
+    return {
+      ...defaultSiteConfig,
+      ...parsed,
+      site: mergeNonEmpty(defaultSiteConfig.site, parsed.site),
+      hero: mergeNonEmpty(defaultSiteConfig.hero, parsed.hero),
+      announcement: mergeNonEmpty(defaultSiteConfig.announcement, parsed.announcement),
+      bio: mergeNonEmpty(defaultSiteConfig.bio, parsed.bio),
+      documentary: mergeNonEmpty(defaultSiteConfig.documentary, parsed.documentary),
+      socials: mergeNonEmpty(defaultSiteConfig.socials, parsed.socials),
+      footer: parsed.footer ? {
+        ...defaultSiteConfig.footer,
+        ...parsed.footer,
+        links: Array.isArray(parsed.footer.links) ? parsed.footer.links : defaultSiteConfig.footer.links
+      } : defaultSiteConfig.footer
+    };
+  };
+
+  let serverApiConnected = false;
+
   try {
-    const savedConfig = localStorage.getItem('belgray_site_config');
-    const savedReleases = localStorage.getItem('belgray_releases');
-
-    if (savedConfig) {
-      const parsed = JSON.parse(savedConfig);
-      siteConfig = {
-        ...defaultSiteConfig,
-        ...parsed,
-        site: mergeNonEmpty(defaultSiteConfig.site, parsed.site),
-        hero: mergeNonEmpty(defaultSiteConfig.hero, parsed.hero),
-        announcement: mergeNonEmpty(defaultSiteConfig.announcement, parsed.announcement),
-        bio: mergeNonEmpty(defaultSiteConfig.bio, parsed.bio),
-        documentary: mergeNonEmpty(defaultSiteConfig.documentary, parsed.documentary),
-        socials: mergeNonEmpty(defaultSiteConfig.socials, parsed.socials),
-        footer: parsed.footer ? {
-          ...defaultSiteConfig.footer,
-          ...parsed.footer,
-          links: Array.isArray(parsed.footer.links) ? parsed.footer.links : defaultSiteConfig.footer.links
-        } : defaultSiteConfig.footer
-      };
-    } else {
-      const res = await fetch('data/site-config.json');
-      if (res.ok) siteConfig = await res.json();
-    }
-
-    if (savedReleases) {
-      const parsedReleases = JSON.parse(savedReleases);
-      if (Array.isArray(parsedReleases) && parsedReleases.length > 0) {
-        releases = parsedReleases.filter(r => r && r.id !== 'the-storm-acoustic');
-        if (releases.length !== parsedReleases.length) {
-          localStorage.setItem('belgray_releases', JSON.stringify(releases));
-        }
-      }
-    } else {
-      const res = await fetch('data/releases.json');
-      if (res.ok) {
-        const jsonReleases = await res.json();
-        if (Array.isArray(jsonReleases) && jsonReleases.length > 0) {
-          releases = jsonReleases;
+    const apiBase = getApiBaseUrl();
+    if (window.location.protocol.startsWith('http') || apiBase.startsWith('http')) {
+      const resApi = await fetch(`${apiBase}/state`, { cache: 'no-store' });
+      if (resApi.ok) {
+        const payload = await resApi.json();
+        if (payload && payload.ok) {
+          if (payload.siteConfig && Object.keys(payload.siteConfig).length > 0) {
+            siteConfig = mergeFullAdminConfig(payload.siteConfig);
+            localStorage.setItem('belgray_site_config', JSON.stringify(siteConfig));
+          }
+          if (Array.isArray(payload.releases) && payload.releases.length > 0) {
+            releases = payload.releases.filter(r => r && r.id !== 'the-storm-acoustic');
+            localStorage.setItem('belgray_releases', JSON.stringify(releases));
+          }
+          serverApiConnected = true;
         }
       }
     }
-  } catch (err) {
-    console.info('Loaded admin with embedded default data:', err.message);
+  } catch (_) {}
+
+  if (!serverApiConnected) {
+    try {
+      const savedConfig = localStorage.getItem('belgray_site_config');
+      const savedReleases = localStorage.getItem('belgray_releases');
+
+      if (savedConfig) {
+        siteConfig = mergeFullAdminConfig(JSON.parse(savedConfig));
+      } else {
+        const res = await fetch('data/site-config.json');
+        if (res.ok) siteConfig = mergeFullAdminConfig(await res.json());
+      }
+
+      if (savedReleases) {
+        const parsedReleases = JSON.parse(savedReleases);
+        if (Array.isArray(parsedReleases) && parsedReleases.length > 0) {
+          releases = parsedReleases.filter(r => r && r.id !== 'the-storm-acoustic');
+          if (releases.length !== parsedReleases.length) {
+            localStorage.setItem('belgray_releases', JSON.stringify(releases));
+          }
+        }
+      } else {
+        const res = await fetch('data/releases.json');
+        if (res.ok) {
+          const jsonReleases = await res.json();
+          if (Array.isArray(jsonReleases) && jsonReleases.length > 0) {
+            releases = jsonReleases;
+          }
+        }
+      }
+    } catch (err) {
+      console.info('Loaded admin with embedded default data:', err.message);
+    }
   }
 
   // 3. Tab Switching
@@ -391,7 +485,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     'tab-media': 'Documentary & Media Hub',
     'tab-theme': 'Era Theme & Visual Styling',
     'tab-footer': 'Footer, Socials & Copyright',
-    'tab-sync': 'Cloud & Security Settings'
+    'tab-sync': 'Server & Python Micro-API'
   };
 
   navItems.forEach(item => {
@@ -496,21 +590,84 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (docLink) docLink.value = d.link || defaultSiteConfig.documentary.link;
   };
 
-  // 4E. Form Binding: Supabase Config
-  const supabaseUrlInput = document.getElementById('cfg-supabase-url');
-  const supabaseKeyInput = document.getElementById('cfg-supabase-key');
+  // 4E. Form Binding: Python + SQLite Micro-API Config
+  const apiUrlInput = document.getElementById('cfg-api-url');
+  const btnTestApi = document.getElementById('btn-test-api');
   const syncStatusText = document.getElementById('sync-status-text');
 
-  const populateSupabaseForm = () => {
+  const updateSyncBadge = (connected) => {
+    serverApiConnected = Boolean(connected);
+    if (syncStatusText) {
+      syncStatusText.textContent = serverApiConnected
+        ? 'PYTHON API + SQLITE SYNCED'
+        : 'LOCAL SYNC READY';
+    }
+  };
+
+  const populateServerApiForm = () => {
     try {
-      const savedSb = JSON.parse(localStorage.getItem('belgray_supabase_cfg') || '{}');
-      if (supabaseUrlInput && savedSb.url) supabaseUrlInput.value = savedSb.url;
-      if (supabaseKeyInput && savedSb.key) supabaseKeyInput.value = savedSb.key;
-      if (syncStatusText && savedSb.url && savedSb.key) {
-        syncStatusText.textContent = 'CLOUD + LOCAL SYNC READY';
+      const savedApi = JSON.parse(localStorage.getItem('belgray_api_cfg') || '{}');
+      if (apiUrlInput && savedApi.url) apiUrlInput.value = savedApi.url;
+    } catch (_) {}
+    updateSyncBadge(serverApiConnected);
+  };
+
+  const syncToServer = async (cfgToSave, releasesToSave) => {
+    try {
+      if (apiUrlInput) {
+        const customUrl = sanitizeUrl(apiUrlInput.value.trim(), '');
+        localStorage.setItem('belgray_api_cfg', JSON.stringify({ url: customUrl }));
+      }
+      const apiBase = getApiBaseUrl();
+      if (!window.location.protocol.startsWith('http') && !apiBase.startsWith('http')) {
+        return false;
+      }
+      const pinHash = getActivePinHash();
+      const res = await fetch(`${apiBase}/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Studio-Pin-Hash': pinHash
+        },
+        body: JSON.stringify({
+          pinHash,
+          siteConfig: cfgToSave,
+          releases: releasesToSave
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.ok) {
+          updateSyncBadge(true);
+          return true;
+        }
       }
     } catch (_) {}
+    return false;
   };
+
+  if (btnTestApi) {
+    btnTestApi.addEventListener('click', async () => {
+      if (apiUrlInput) {
+        const customUrl = sanitizeUrl(apiUrlInput.value.trim(), '');
+        localStorage.setItem('belgray_api_cfg', JSON.stringify({ url: customUrl }));
+      }
+      const apiBase = getApiBaseUrl();
+      try {
+        const res = await fetch(`${apiBase}/health`, { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.ok) {
+            updateSyncBadge(true);
+            showToast('Connected to Python + SQLite Micro-API!');
+            return;
+          }
+        }
+      } catch (_) {}
+      updateSyncBadge(false);
+      showToast('Python API not reachable yet (running in Local Mode).');
+    });
+  }
 
   // 4F. Form Binding: Footer, Socials & Copyright
   const footerEmailInput = document.getElementById('cfg-footer-email');
@@ -854,6 +1011,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       releases[0].isLatest = true;
     }
     localStorage.setItem('belgray_releases', JSON.stringify(releases));
+    syncToServer(siteConfig, releases);
   };
 
   const renderReleasesAdmin = () => {
@@ -1032,47 +1190,78 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 7. Supabase SQL Copy & JSON Backup Exports
+  // 7. Server Deployment Config Copy & JSON Backup Exports
   const btnCopySql = document.getElementById('btn-copy-sql');
   if (btnCopySql) {
     btnCopySql.addEventListener('click', () => {
-      const sql = `-- 1. Create tables for Bel Gray releases & site config
-CREATE TABLE IF NOT EXISTS releases (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  type TEXT,
-  category TEXT,
-  year TEXT,
-  releaseDate TEXT,
-  coverUrl TEXT,
-  accentColor TEXT,
-  tagline TEXT,
-  isLatest BOOLEAN DEFAULT false,
-  status TEXT,
-  smartlink TEXT,
-  craftSpec JSONB,
-  tracklist JSONB,
-  links JSONB
-);
+      const deploySnippet = `# 1. Run via systemd (auto-restart on reboot/crash)
+# /etc/systemd/system/belgray-api.service
+[Unit]
+Description=Bel Gray Python SQLite Micro-API
+After=network.target
 
-CREATE TABLE IF NOT EXISTS site_config (
-  id TEXT PRIMARY KEY DEFAULT 'global',
-  data JSONB NOT NULL
-);
+[Service]
+WorkingDirectory=/var/www/belgray_artist
+ExecStart=/usr/bin/python3 /var/www/belgray_artist/server.py
+Environment="HOST=127.0.0.1" "PORT=8080"
+Restart=always
+RestartSec=2
 
--- 2. Enable Row Level Security (RLS) so public visitors can only READ
-ALTER TABLE releases ENABLE ROW LEVEL SECURITY;
-ALTER TABLE site_config ENABLE ROW LEVEL SECURITY;
+[Install]
+WantedBy=multi-user.target
 
-CREATE POLICY "Public Read Releases" ON releases FOR SELECT USING (true);
-CREATE POLICY "Public Read Config" ON site_config FOR SELECT USING (true);
-
--- 3. Restrict INSERT/UPDATE/DELETE strictly to authenticated admin user
-CREATE POLICY "Admin Write Releases" ON releases FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Admin Write Config" ON site_config FOR ALL TO authenticated USING (true) WITH CHECK (true);`;
-      navigator.clipboard.writeText(sql).then(() => {
-        showToast('RLS-Protected SQL Schema copied!');
+# 2. Zero-Downtime Nginx block for https://cloud-belgray.com/belgray_artist
+location /belgray_artist/api/ {
+    proxy_pass http://127.0.0.1:8080/belgray_artist/api/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+location /belgray_artist/ {
+    alias /var/www/belgray_artist/;
+    index index.html;
+    try_files $uri $uri/ /belgray_artist/index.html;
+}`;
+      navigator.clipboard.writeText(deploySnippet).then(() => {
+        showToast('Systemd + Zero-Downtime Nginx config copied!');
       });
+    });
+  }
+
+  const btnRollbackServer = document.getElementById('btn-rollback-server');
+  if (btnRollbackServer) {
+    btnRollbackServer.addEventListener('click', async () => {
+      if (!confirm('Roll back to the previous saved snapshot in SQLite?')) return;
+      try {
+        const apiBase = getApiBaseUrl();
+        const pinHash = getActivePinHash();
+        const res = await fetch(`${apiBase}/rollback`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Studio-Pin-Hash': pinHash
+          },
+          body: JSON.stringify({ pinHash })
+        });
+        const data = await res.json();
+        if (res.ok && data && data.ok && data.state) {
+          siteConfig = mergeFullAdminConfig(data.state.siteConfig);
+          releases = Array.isArray(data.state.releases) ? data.state.releases : releases;
+          localStorage.setItem('belgray_site_config', JSON.stringify(siteConfig));
+          localStorage.setItem('belgray_releases', JSON.stringify(releases));
+          populateBannerForm();
+          populateHeroForm();
+          populateBioForm();
+          populateDocForm();
+          populateFooterForm();
+          renderReleasesAdmin();
+          showToast('Rolled back to previous SQLite snapshot!');
+        } else {
+          showToast(data?.error || 'Could not roll back (no snapshots or server offline).');
+        }
+      } catch (_) {
+        showToast('Python API server is not reachable in Local Mode.');
+      }
     });
   }
 
@@ -1199,21 +1388,13 @@ CREATE POLICY "Admin Write Config" ON site_config FOR ALL TO authenticated USING
         featuredRel.accentColor = validEraHex;
       }
 
-      // Save Supabase credentials if entered
-      if (supabaseUrlInput || supabaseKeyInput) {
-        const sbUrl = sanitizeUrl(supabaseUrlInput?.value.trim() || '', '');
-        const sbKey = supabaseKeyInput?.value.trim() || '';
-        localStorage.setItem('belgray_supabase_cfg', JSON.stringify({ url: sbUrl, key: sbKey }));
-        if (syncStatusText) {
-          syncStatusText.textContent = sbUrl && sbKey ? 'CLOUD + LOCAL SYNC READY' : 'LOCAL SYNC READY';
-        }
-      }
-
-      // Persist in localStorage
+      // Persist in localStorage & sync to Python + SQLite Micro-API
       localStorage.setItem('belgray_site_config', JSON.stringify(siteConfig));
       persistReleasesImmediate();
 
-      showToast('All changes saved! Live site updated.');
+      showToast(serverApiConnected
+        ? 'All changes saved to Python SQLite Server!'
+        : 'All changes saved! Live site updated.');
     });
   }
 
@@ -1234,6 +1415,6 @@ CREATE POLICY "Admin Write Config" ON site_config FOR ALL TO authenticated USING
   populateBioForm();
   populateDocForm();
   populateFooterForm();
-  populateSupabaseForm();
+  populateServerApiForm();
   renderReleasesAdmin();
 });

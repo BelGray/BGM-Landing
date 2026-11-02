@@ -149,3 +149,7 @@ vite.config.ts.timestamp-*
 .turbo
 
 localdata/
+data/*.db
+data/*.db-wal
+data/*.db-shm
+__pycache__/
